@@ -3,6 +3,21 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] — 2026-11-01
+
+### Fixed
+- **"Stop All" now stops every module.** The reverse-order loop used `tac` (GNU coreutils, not present on
+  macOS), so it expanded to nothing and only nginx stopped. Replaced with an explicit `MODULES_STOP` order.
+- ShellCheck findings (`A && B || C`, `ls | head`, unquoted vars) so the CI gate is clean.
+
+### Added
+- **CI** (GitHub Actions): `shellcheck` + `bash -n`; on macOS a `/bin/bash` 3.2 parse, Swift app build,
+  icon/banner render, and `install.sh --dry-run`. CI badge in the README.
+- Repository is **public**: install instructions, live release/stars badges, public security-reporting guidance.
+
+### Changed
+- Release notes and install docs updated for a public repository.
+
 ## [1.0.0] — 2026-11-01
 
 ### Added
@@ -24,3 +39,4 @@ All notable changes to this project are documented here. The format follows
 - `sites.conf` input is validated before being written into web-server configuration.
 
 [1.0.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.0.0
+[1.0.1]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.0.1
