@@ -11,6 +11,7 @@ NGINX_SERVERS_DIR="$HOMEBREW_PREFIX/etc/nginx/servers"
 HTTPD_VHOSTS_DIR="$HOMEBREW_PREFIX/etc/httpd/vhosts"
 
 trim() { printf '%s' "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'; }
+# shellcheck disable=SC2088  # the quoted ~ is a literal match, not an expansion
 expand_tilde() { case "$1" in "~"|"~/"*) printf '%s%s' "$HOME" "${1#\~}" ;; *) printf '%s' "$1" ;; esac; }
 
 # Echo normalized, tab-separated rows: host \t docroot \t php \t kind \t aliases
@@ -57,7 +58,8 @@ sites_hosts() {
 }
 
 _nginx_write() {
-  local host="$1" aliases="$2" file="$NGINX_SERVERS_DIR/$host.conf"
+  local host="$1" aliases="$2"
+  local file="$NGINX_SERVERS_DIR/$host.conf"
   local names="$host"
   [ -n "$aliases" ] && names="$host $(printf '%s' "$aliases" | tr ',' ' ')"
 
@@ -110,7 +112,8 @@ NGINX
 }
 
 _apache_write() {
-  local host="$1" docroot="$2" php="$3" aliases="$4" file="$HTTPD_VHOSTS_DIR/$host.conf"
+  local host="$1" docroot="$2" php="$3" aliases="$4"
+  local file="$HTTPD_VHOSTS_DIR/$host.conf"
   local sock; sock="$(phpver_socket "$php")"
   {
     echo "<VirtualHost *:${APACHE_PORT}>"

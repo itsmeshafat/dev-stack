@@ -27,9 +27,9 @@ module_detail() {
     postgres) echo "127.0.0.1:5432" ;;
     redis)    echo "127.0.0.1:6379" ;;
     mail)     echo "smtp :1025 / ui :8025" ;;
-    php85)    echo "$(phpver_socket 8.5)" ;;
-    php83)    echo "$(phpver_socket 8.3)" ;;
-    php74)    echo "$(phpver_socket 7.4)" ;;
+    php85)    phpver_socket 8.5 ;;
+    php83)    phpver_socket 8.3 ;;
+    php74)    phpver_socket 7.4 ;;
     apache)   echo "127.0.0.1:${APACHE_PORT}" ;;
     web)      if [ "${SSL:-0}" = "1" ]; then echo "nginx :${NGINX_PORT}/:${SSL_PORT} (hosts-based DNS)"; else echo "nginx :${NGINX_PORT} (hosts-based DNS)"; fi ;;
     *)        echo "" ;;

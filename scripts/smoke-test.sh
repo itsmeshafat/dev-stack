@@ -56,4 +56,4 @@ fi
 
 echo
 echo "passed: $pass   failed: $fail"
-exit $([ "$fail" = 0 ] && echo 0 || echo 1)
+exit "$([ "$fail" = 0 ] && echo 0 || echo 1)"

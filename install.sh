@@ -61,7 +61,12 @@ preflight() {
   fi
   if ! command -v brew >/dev/null 2>&1 && [ ! -x "$BREW" ]; then
     warn "Homebrew not found at $HOMEBREW_PREFIX"
-    confirm "Install Homebrew now?" && run /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || die "Homebrew is required"
+    confirm "Install Homebrew now?" || die "Homebrew is required"
+    if [ "$DRY_RUN" = "1" ]; then
+      printf '  \033[2m[dry-run]\033[0m install Homebrew\n'
+    else
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
   fi
   ok "preflight passed (brew: $HOMEBREW_PREFIX, user: $DEV_USER)"
 }

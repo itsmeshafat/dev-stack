@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  shell:
+    name: Shell scripts (shellcheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: |
+          shellcheck --version
+          shellcheck install.sh uninstall.sh bin/* lib/*.sh scripts/*.sh
+      - name: bash -n
+        run: |
+          for f in install.sh uninstall.sh bin/* lib/*.sh scripts/*.sh; do
+            bash -n "$f" && echo "ok: $f"
+          done
+
+  macos:
+    name: macOS (bash 3.2 + Swift build)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse with /bin/bash (macOS ships 3.2)
+        run: |
+          /bin/bash --version | head -1
+          for f in install.sh uninstall.sh bin/* lib/*.sh scripts/*.sh; do
+            /bin/bash -n "$f" && echo "ok: $f"
+          done
+
+      - name: Build the app
+        run: |
+          swiftc --version
+          swiftc -O -parse-as-library -o /tmp/DevStack app/main.swift -framework SwiftUI -framework AppKit
+          test -x /tmp/DevStack && echo "app builds"
+
+      - name: Generate icon and banner (original vector assets)
+        run: |
+          swiftc -O -o /tmp/makeicon app/makeicon.swift -framework AppKit
+          /tmp/makeicon /tmp/icon.png
+          test -s /tmp/icon.png && echo "icon renders"
+          swiftc -O -o /tmp/makebanner app/makebanner.swift -framework AppKit
+          /tmp/makebanner /tmp/banner.png
+          test -s /tmp/banner.png && echo "banner renders"
+
+      - name: Installer dry-run (must change nothing)
+        run: |
+          ./install.sh --dry-run --no-brew --no-helper
+          echo "dry-run exit: $?"

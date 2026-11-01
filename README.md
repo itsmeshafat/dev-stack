@@ -14,6 +14,7 @@
   <a href="#requirements"><img alt="Homebrew" src="https://img.shields.io/badge/Homebrew-required-fbb040?logo=homebrew&logoColor=white"></a>
   <img alt="arch" src="https://img.shields.io/badge/arm64%20%7C%20x86__64-supported-blue">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3DA639"></a>
+  <a href="https://github.com/itsmeshafat/dev-stack/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/itsmeshafat/dev-stack/actions/workflows/ci.yml/badge.svg"></a>
   <a href="https://github.com/itsmeshafat/dev-stack/releases"><img alt="Release" src="https://img.shields.io/github/v/release/itsmeshafat/dev-stack?color=6E56CF&label=release&sort=semver"></a>
   <a href="https://github.com/itsmeshafat/dev-stack/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/itsmeshafat/dev-stack?color=6E56CF"></a>
 </p>

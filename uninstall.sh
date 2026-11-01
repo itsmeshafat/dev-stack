@@ -47,7 +47,7 @@ note "mkcert's local CA is left in your keychain; remove it with: mkcert -uninst
 
 info "restoring most recent config backup"
 if [ "$DRY_RUN" != "1" ]; then
-  last="$(ls -1dt "$DEVSTACK_BACKUP_DIR"/* 2>/dev/null | head -1)"
+  last="$(find "$DEVSTACK_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort -r | head -1)"
   if [ -n "${last:-}" ]; then
     note "from $last"
     [ -f "$last/hosts" ] && sudo cp "$last/hosts" /etc/hosts 2>/dev/null || true
