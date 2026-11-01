@@ -1,10 +1,33 @@
 // makebanner.swift — renders the README hero banner (1600×420) to argv[1].
-// Diagonal blue→indigo gradient, the app icon, wordmark and stack tagline.
+// Diagonal gradient, the icon tile, wordmark, tagline and an original rack glyph.
+// No third-party assets, no SF Symbols, no stock art.
 import AppKit
 import Foundation
 
 let out = CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "banner.png"
 let W: CGFloat = 1600, H: CGFloat = 420
+
+func drawRackGlyph(in rect: NSRect, color: NSColor, thickness: CGFloat) {
+    color.setStroke()
+    color.setFill()
+    let body = NSBezierPath(roundedRect: rect, xRadius: rect.width * 0.14, yRadius: rect.width * 0.14)
+    body.lineWidth = thickness
+    body.stroke()
+    let lines = NSBezierPath()
+    for i in 1...2 {
+        let y = rect.minY + rect.height * CGFloat(i) / 3.0
+        lines.move(to: NSPoint(x: rect.minX + thickness / 2, y: y))
+        lines.line(to: NSPoint(x: rect.maxX - thickness / 2, y: y))
+    }
+    lines.lineWidth = thickness
+    lines.stroke()
+    let dotR = thickness * 0.85
+    for i in 0..<3 {
+        let cy = rect.minY + rect.height * (CGFloat(i) + 0.5) / 3.0
+        let cx = rect.maxX - rect.width * 0.17
+        NSBezierPath(ovalIn: NSRect(x: cx - dotR, y: cy - dotR, width: dotR * 2, height: dotR * 2)).fill()
+    }
+}
 
 let img = NSImage(size: NSSize(width: W, height: H))
 img.lockFocus()
@@ -15,7 +38,7 @@ NSGradient(colors: [
     NSColor(srgbRed: 0.38, green: 0.16, blue: 0.80, alpha: 1.0)
 ])!.draw(in: NSRect(x: 0, y: 0, width: W, height: H), angle: -32)
 
-// soft radial highlight
+// soft radial highlights
 if let ctx = NSGraphicsContext.current?.cgContext {
     let cols = [NSColor.white.withAlphaComponent(0.20).cgColor,
                 NSColor.white.withAlphaComponent(0.0).cgColor] as CFArray
@@ -31,7 +54,7 @@ if let ctx = NSGraphicsContext.current?.cgContext {
     }
 }
 
-// app icon (glassy rounded square + glyph)
+// icon tile
 let s: CGFloat = 236
 let iconRect = NSRect(x: 84, y: (H - s) / 2, width: s, height: s)
 let ipath = NSBezierPath(roundedRect: iconRect, xRadius: s * 0.2237, yRadius: s * 0.2237)
@@ -40,14 +63,16 @@ ipath.addClip()
 NSGradient(colors: [NSColor.white.withAlphaComponent(0.30), NSColor.white.withAlphaComponent(0.05)])!
     .draw(in: iconRect, angle: -90)
 NSGraphicsContext.restoreGraphicsState()
-if let sym = NSImage(systemSymbolName: "server.rack", accessibilityDescription: nil),
-   let sized = sym.withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: s * 0.42, weight: .regular)) {
-    let white = NSImage(size: sized.size, flipped: false) { r in
-        sized.draw(in: r); NSColor.white.set(); r.fill(using: .sourceAtop); return true
-    }
-    let w = sized.size.width, h = sized.size.height
-    white.draw(in: NSRect(x: iconRect.midX - w / 2, y: iconRect.midY - h / 2, width: w, height: h))
-}
+
+let gw = s * 0.46
+let glyph = NSRect(x: iconRect.midX - gw / 2, y: iconRect.midY - gw * 0.41,
+                   width: gw, height: gw * 0.82)
+drawRackGlyph(in: glyph, color: .white, thickness: s * 0.030)
+
+// faint watermark to balance the composition
+let ww: CGFloat = 250
+let watermark = NSRect(x: W - ww - 96, y: (H - ww * 0.82) / 2, width: ww, height: ww * 0.82)
+drawRackGlyph(in: watermark, color: NSColor.white.withAlphaComponent(0.10), thickness: ww * 0.030)
 
 func draw(_ t: String, _ x: CGFloat, _ y: CGFloat, _ size: CGFloat, _ weight: NSFont.Weight, _ alpha: CGFloat) {
     let a: [NSAttributedString.Key: Any] = [
@@ -55,17 +80,6 @@ func draw(_ t: String, _ x: CGFloat, _ y: CGFloat, _ size: CGFloat, _ weight: NS
         .foregroundColor: NSColor.white.withAlphaComponent(alpha)
     ]
     (t as NSString).draw(at: NSPoint(x: x, y: y), withAttributes: a)
-}
-
-// faint server-rack watermark on the right to balance the composition
-if let sym = NSImage(systemSymbolName: "server.rack", accessibilityDescription: nil),
-   let sized = sym.withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: 380, weight: .regular)) {
-    let faint = NSImage(size: sized.size, flipped: false) { r in
-        sized.draw(in: r); NSColor.white.set(); r.fill(using: .sourceAtop); return true
-    }
-    let w = sized.size.width, h = sized.size.height
-    faint.draw(in: NSRect(x: W - w - 70, y: (H - h) / 2, width: w, height: h),
-               from: .zero, operation: .sourceOver, fraction: 0.09)
 }
 
 draw("dev-stack", 384, 132, 116, .bold, 1.0)

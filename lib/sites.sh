@@ -20,10 +20,27 @@ sites_rows() {
     host="$(trim "${host:-}")"
     [ -z "$host" ] && continue
     case "$host" in \#*) continue ;; esac
-    docroot="$(trim "${docroot:-}")"
+    # validate the hostname charset — prevents config//etc/hosts injection
+    case "$host" in
+      .*|*[!A-Za-z0-9.-]*) warn "sites.conf: skipping invalid host '$host'"; continue ;;
+    esac
+    docroot="$(trim "${docroot:-}" | tr -d '\r\n')"
+    case "$docroot" in
+      *'"'*|*';'*) warn "sites.conf: skipping $host (invalid docroot)"; continue ;;
+    esac
     php="$(trim "${php:-}")"; [ -z "$php" ] && php="8.5"
+    case "$php" in *[!0-9.]*) php="8.5" ;; esac
     kind="$(trim "${kind:-}")"; [ -z "$kind" ] && kind="php"
+    # sanitize aliases: keep only valid hostnames
     aliases="$(trim "${aliases:-}")"
+    if [ -n "$aliases" ]; then
+      local clean="" a
+      for a in $(printf '%s' "$aliases" | tr ',' ' '); do
+        case "$a" in .*|*[!A-Za-z0-9.-]*) continue ;; esac
+        clean="${clean:+$clean,}$a"
+      done
+      aliases="$clean"
+    fi
     printf '%s\t%s\t%s\t%s\t%s\n' "$host" "$(expand_tilde "$docroot")" "$php" "$kind" "$aliases"
   done < "$DEVSTACK_SITES_CONF"
 }

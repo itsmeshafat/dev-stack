@@ -190,6 +190,9 @@ More in [`docs/INSTALL.md`](docs/INSTALL.md).
 - [`docs/INSTALL.md`](docs/INSTALL.md) — install, flags, troubleshooting
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — how the pieces fit
 - [`docs/SAFETY.md`](docs/SAFETY.md) — exactly what it touches on your machine
+- [`SECURITY.md`](SECURITY.md) — privileged surface, threat model, reporting
+- [`docs/NOTICE.md`](docs/NOTICE.md) — originality, asset & dependency licensing
+- [`CHANGELOG.md`](CHANGELOG.md) — release history
 
 ## License
 

@@ -11,7 +11,7 @@ hosts_names() {
   grep -hE '^[[:space:]]*server_name' "$NGINX_SERVERS_DIR"/*.conf 2>/dev/null \
     | sed -E 's/^[[:space:]]*server_name[[:space:]]+//; s/;//g' \
     | tr ' ' '\n' \
-    | grep -vE '^$|^_$|\*' \
+    | grep -E '^[A-Za-z0-9][A-Za-z0-9._-]*$' \
     | sort -u
 }
 

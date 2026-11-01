@@ -1,5 +1,6 @@
-// makeicon.swift — renders the app icon (1024²) to a PNG path given as argv[1].
-// Blue→indigo rounded square + white "server.rack" SF Symbol. No external assets.
+// makeicon.swift — renders the app icon (1024²) to argv[1].
+// Blue→indigo rounded square with an ORIGINAL vector "server rack" glyph.
+// No third-party assets, no SF Symbols, no stock art.
 import AppKit
 import Foundation
 
@@ -7,6 +8,28 @@ let out = CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "icon_102
 let px: CGFloat = 1024
 let inset: CGFloat = 44
 let radius: CGFloat = (px - inset * 2) * 0.2237   // squircle-ish
+
+func drawRackGlyph(in rect: NSRect, color: NSColor, thickness: CGFloat) {
+    color.setStroke()
+    color.setFill()
+    let body = NSBezierPath(roundedRect: rect, xRadius: rect.width * 0.14, yRadius: rect.width * 0.14)
+    body.lineWidth = thickness
+    body.stroke()
+    let lines = NSBezierPath()
+    for i in 1...2 {
+        let y = rect.minY + rect.height * CGFloat(i) / 3.0
+        lines.move(to: NSPoint(x: rect.minX + thickness / 2, y: y))
+        lines.line(to: NSPoint(x: rect.maxX - thickness / 2, y: y))
+    }
+    lines.lineWidth = thickness
+    lines.stroke()
+    let dotR = thickness * 0.85
+    for i in 0..<3 {
+        let cy = rect.minY + rect.height * (CGFloat(i) + 0.5) / 3.0
+        let cx = rect.maxX - rect.width * 0.17
+        NSBezierPath(ovalIn: NSRect(x: cx - dotR, y: cy - dotR, width: dotR * 2, height: dotR * 2)).fill()
+    }
+}
 
 let canvas = NSImage(size: NSSize(width: px, height: px))
 canvas.lockFocus()
@@ -20,37 +43,25 @@ if let ctx = NSGraphicsContext.current?.cgContext {
 // rounded-square gradient
 let rect = NSRect(x: inset, y: inset, width: px - inset * 2, height: px - inset * 2)
 let path = NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius)
-let grad = NSGradient(colors: [
+NSGradient(colors: [
     NSColor(srgbRed: 0.23, green: 0.44, blue: 0.98, alpha: 1.0),   // blue
     NSColor(srgbRed: 0.36, green: 0.19, blue: 0.82, alpha: 1.0)    // indigo
-])!
-grad.draw(in: path, angle: -90)
+])!.draw(in: path, angle: -90)
 
 // top highlight
 if let ctx = NSGraphicsContext.current?.cgContext {
     ctx.setShadow(offset: .zero, blur: 0, color: nil)
     NSGraphicsContext.saveGraphicsState()
     path.addClip()
-    let hi = NSGradient(colors: [NSColor.white.withAlphaComponent(0.22), NSColor.white.withAlphaComponent(0.0)])!
-    hi.draw(in: NSRect(x: inset, y: px * 0.55, width: px - inset * 2, height: px * 0.45), angle: -90)
+    NSGradient(colors: [NSColor.white.withAlphaComponent(0.22), NSColor.white.withAlphaComponent(0.0)])!
+        .draw(in: NSRect(x: inset, y: px * 0.55, width: px - inset * 2, height: px * 0.45), angle: -90)
     NSGraphicsContext.restoreGraphicsState()
 }
 
-// white glyph
-if let sym = NSImage(systemSymbolName: "server.rack", accessibilityDescription: nil) {
-    let cfg = NSImage.SymbolConfiguration(pointSize: px * 0.40, weight: .regular)
-    if let sized = sym.withSymbolConfiguration(cfg) {
-        let white = NSImage(size: sized.size, flipped: false) { r in
-            sized.draw(in: r)
-            NSColor.white.set()
-            r.fill(using: .sourceAtop)
-            return true
-        }
-        let w = sized.size.width, h = sized.size.height
-        let dst = NSRect(x: (px - w) / 2, y: (px - h) / 2 - px * 0.01, width: w, height: h)
-        white.draw(in: dst, from: .zero, operation: .sourceOver, fraction: 1.0)
-    }
-}
+// original glyph (centered, ~46% of the canvas)
+let gw = (px - inset * 2) * 0.46
+let glyph = NSRect(x: (px - gw) / 2, y: (px - gw * 0.82) / 2, width: gw, height: gw * 0.82)
+drawRackGlyph(in: glyph, color: .white, thickness: px * 0.030)
 
 canvas.unlockFocus()
 
