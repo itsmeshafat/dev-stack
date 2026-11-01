@@ -14,7 +14,8 @@
   <a href="#requirements"><img alt="Homebrew" src="https://img.shields.io/badge/Homebrew-required-fbb040?logo=homebrew&logoColor=white"></a>
   <img alt="arch" src="https://img.shields.io/badge/arm64%20%7C%20x86__64-supported-blue">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3DA639"></a>
-  <img alt="version" src="https://img.shields.io/badge/version-1.0.0-6E56CF">
+  <a href="https://github.com/itsmeshafat/dev-stack/releases"><img alt="Release" src="https://img.shields.io/github/v/release/itsmeshafat/dev-stack?color=6E56CF&label=release&sort=semver"></a>
+  <a href="https://github.com/itsmeshafat/dev-stack/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/itsmeshafat/dev-stack?color=6E56CF"></a>
 </p>
 
 <p align="center">
@@ -57,14 +58,21 @@
 
 ## Install
 
-> This repository is **private**, so a raw `curl | bash` won't work — clone with auth.
+**Clone, inspect, then run** (recommended):
 
 ```bash
-gh repo clone itsmeshafat/dev-stack
+git clone https://github.com/itsmeshafat/dev-stack.git
 cd dev-stack
 
-./install.sh --dry-run     # print every action, change nothing
-./install.sh               # install (asks for your password once — scoped helper)
+./install.sh --dry-run     # prints every action, changes nothing
+./install.sh               # install (one password prompt for the scoped helper)
+```
+
+Or download the installer and read it before running:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/itsmeshafat/dev-stack/main/install.sh
+less install.sh && bash install.sh --dry-run && bash install.sh
 ```
 
 Then define your sites and bring the stack up:

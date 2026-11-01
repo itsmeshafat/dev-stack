@@ -4,8 +4,9 @@ dev-stack manages **local development services on your own Mac**. It is not hard
 multi-user servers — do not run it on a shared/production host.
 
 ## Reporting a vulnerability
-Please **do not** open a public issue. Use GitHub's **Security → Report a vulnerability** (private advisory)
-on this repository. Include steps to reproduce and the affected script/version.
+This repository is **public**. Please **do not** open a public issue or PR for security problems — use
+GitHub's **Security → Report a vulnerability** (private advisory) instead. Include steps to reproduce and the
+affected script/version.
 
 ## Privileged surface (the whole of it)
 Exactly one script runs as root, via a single sudoers rule:

@@ -9,7 +9,7 @@
 
 ## Steps
 ```bash
-gh repo clone itsmeshafat/dev-stack    # private repo — gh (or git) auth required
+git clone https://github.com/itsmeshafat/dev-stack.git
 cd dev-stack
 ./install.sh --dry-run                 # prints every action, changes nothing
 ./install.sh                           # real install
