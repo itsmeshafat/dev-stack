@@ -1,4 +1,4 @@
-# dev-stack
+# Dev Stack
 
 A safe, single-command **local development stack for macOS** — nginx + Apache, PHP-FPM (multiple
 versions), MySQL, PostgreSQL, Redis and Mailpit — with a native GUI app to start/stop everything and
