@@ -13,9 +13,9 @@ permissions:
 jobs:
   shell:
     name: Shell scripts (shellcheck)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: shellcheck
         run: |
           shellcheck --version
@@ -30,7 +30,7 @@ jobs:
     name: macOS (bash 3.2 + Swift build)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Parse with /bin/bash (macOS ships 3.2)
         run: |
