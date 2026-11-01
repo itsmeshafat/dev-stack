@@ -118,8 +118,9 @@ Apache is bound to **loopback only** — nothing is exposed beyond your machine.
 </details>
 
 > **Tooling** — alongside the services, the installer provisions **`composer`** and **`wp-cli`**.
-> When a project pins an older PHP, run Composer with that PHP:
-> `/opt/homebrew/opt/php@8.3/bin/php "$(command -v composer)" install`
+> Run Composer with the PHP a site declares (resolved from `sites.conf`):
+> `devstack composer --site casepilot.test -- install` — or from inside a project dir just
+> `devstack composer install`.
 
 ## Configuration
 
@@ -151,6 +152,7 @@ APACHE_PORT=8081
 | `devstack sites` | List configured sites |
 | `devstack add-site` | Add a site interactively |
 | `devstack sync` | Regenerate vhosts and reload nginx + Apache |
+| `devstack composer [--site H \| --php V] …` | Run Composer with the site's PHP, from its project root |
 | `devstack doctor` | Verify formulae, services, configs, helper, and every site |
 
 ## Safety

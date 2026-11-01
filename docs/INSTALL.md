@@ -36,8 +36,13 @@ devstack restart web
 devstack doctor                         # expect all-green
 ```
 
-Installed tooling also includes **Composer** and **wp-cli**. If a project pins an older PHP, run
-Composer with that PHP: `/opt/homebrew/opt/php@8.3/bin/php "$(command -v composer)" install`.
+Installed tooling also includes **Composer** and **wp-cli**. Run Composer with the PHP a site declares:
+
+```bash
+devstack composer --site casepilot.test -- install    # explicit site
+devstack composer install                             # auto-detected from $PWD
+devstack composer --php 7.4 -- --version              # explicit PHP
+```
 
 ## Troubleshooting
 | Symptom | Fix |

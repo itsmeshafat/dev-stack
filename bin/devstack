@@ -122,6 +122,73 @@ cmd_sync() {
   ok "synced"
 }
 
+php_bin_for() {
+  case "$1" in
+    8.5|8.5.*) echo "$HOMEBREW_PREFIX/opt/php/bin/php" ;;
+    *)         echo "$HOMEBREW_PREFIX/opt/php@$1/bin/php" ;;
+  esac
+}
+
+# The directory where composer.json usually lives (docroot, or its parent for */public).
+project_root_of() {
+  local d="$1"
+  if [ "$(basename "$d")" = "public" ]; then dirname "$d"; else printf '%s' "$d"; fi
+}
+
+cmd_composer() {
+  local site="" php="" want=()
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --site)   site="$2"; shift 2 ;;
+      --site=*) site="${1#*=}"; shift ;;
+      --php)    php="$2"; shift 2 ;;
+      --php=*)  php="${1#*=}"; shift ;;
+      --)       shift; while [ $# -gt 0 ]; do want+=("$1"); shift; done ;;
+      *)        want+=("$1"); shift ;;
+    esac
+  done
+
+  local docroot=""
+  if [ -n "$site" ]; then
+    local row; row="$(sites_rows | awk -F'\t' -v h="$site" '$1==h{print $2 "\t" $3; exit}')"
+    [ -n "$row" ] || die "unknown site: $site  (see: devstack sites)"
+    docroot="${row%%$'\t'*}"; php="${php:-${row##*$'\t'}}"
+  fi
+
+  # auto-detect from the current directory (site project root is an ancestor of $PWD)
+  if [ -z "$docroot" ] && [ -z "$php" ]; then
+    local h d p k a pr
+    while IFS=$'\t' read -r h d p k a; do
+      pr="$(project_root_of "$d")"
+      case "$PWD/" in
+        "$pr"/*) docroot="$d"; php="$p"; break ;;
+      esac
+    done < <(sites_rows)
+  fi
+
+  [ -n "$php" ] || php="8.5"
+  local phpbin; phpbin="$(php_bin_for "$php")"
+  [ -x "$phpbin" ] || die "PHP $php not installed ($phpbin)"
+
+  local composer_bin; composer_bin="$(command -v composer || true)"
+  [ -n "$composer_bin" ] || die "composer not found — run ./install.sh"
+
+  # run where composer.json lives; default to the site's project root
+  local workdir="$PWD"
+  if [ -n "$docroot" ]; then
+    workdir="$(project_root_of "$docroot")"
+    local c
+    for c in "$docroot" "$workdir"; do
+      if [ -f "$c/composer.json" ]; then workdir="$c"; break; fi
+    done
+    [ -d "$workdir" ] || workdir="$docroot"
+  fi
+
+  info "composer · PHP $php · $workdir"
+  cd "$workdir" || die "cannot cd to $workdir"
+  "$phpbin" "$composer_bin" ${want[@]+"${want[@]}"}
+}
+
 usage() {
   cat <<EOF
 devstack $DEVSTACK_VERSION — local dev stack control
@@ -137,6 +204,7 @@ Commands:
   sites                  list configured sites
   add-site               interactively add a site
   sync                   regenerate vhosts + reload nginx/apache
+  composer [opts] ...    run Composer with the site's PHP (--site HOST | --php VER)
   doctor                 verify services, configs, ports, helper, sites
   version                print version
 
@@ -154,6 +222,7 @@ case "$cmd" in
   sites)   cmd_sites ;;
   add-site) cmd_add_site ;;
   sync)     cmd_sync ;;
+  composer) shift; cmd_composer "$@" ;;
   doctor)  cmd_doctor ;;
   version|-v|--version) echo "devstack $DEVSTACK_VERSION" ;;
   -h|--help|help) usage ;;
