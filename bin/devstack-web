@@ -38,6 +38,8 @@ hosts_sync(){
             | tr ' ' '\n' | grep -vE '^$|^_$|\*' | sort -u)"
   [ -n "$names" ] || { warn "no server_name found; /etc/hosts unchanged"; return 0; }
   sed -i '' "/$HOSTS_BEGIN/,/$HOSTS_END/d" "$HOSTS_FILE" 2>/dev/null || true
+  # drop a legacy block from older dev-stack versions
+  sed -i '' '/# devstack-hosts-begin/,/# devstack-hosts-end/d' "$HOSTS_FILE" 2>/dev/null || true
   {
     echo "$HOSTS_BEGIN"
     while read -r n; do [ -n "$n" ] && echo "127.0.0.1 $n"; done <<< "$names"
