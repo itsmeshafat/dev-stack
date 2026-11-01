@@ -1,16 +1,26 @@
 #!/usr/bin/env bash
 # install-helper-root — installs devstack-web + the scoped sudo rule.
-# Must run as root (invoked via sudo or `osascript ... with administrator privileges`).
-#   install-helper-root <target-user> <package-root>
+# Must run as root. Arguments are OPTIONAL:
+#   install-helper-root [target-user] [package-root]
+# Defaults: target-user = $SUDO_USER (the user who invoked sudo),
+#           package-root = this script's repo root (…/bin/..).
 set -euo pipefail
 
-TARGET_USER="${1:?target user required}"
-PKG="${2:?package root required}"
+SELF_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TARGET_USER="${1:-${SUDO_USER:-}}"
+PKG="${2:-$(cd -P "$SELF_DIR/.." && pwd)}"
+
 HELPER_DST="/usr/local/sbin/devstack-web"
 SUDOERS_DST="/etc/sudoers.d/devstack"
 
-[ -f "$PKG/bin/devstack-web" ] || { echo "missing $PKG/bin/devstack-web" >&2; exit 1; }
-[ -n "$TARGET_USER" ] && [ "$TARGET_USER" != "root" ] || { echo "refusing to grant root" >&2; exit 1; }
+if [ -z "$TARGET_USER" ] || [ "$TARGET_USER" = "root" ]; then
+  echo "refusing: cannot determine non-root target user (pass it as the first argument)" >&2
+  exit 1
+fi
+if [ ! -f "$PKG/bin/devstack-web" ]; then
+  echo "missing $PKG/bin/devstack-web (pass the package root as the second argument)" >&2
+  exit 1
+fi
 
 mkdir -p /usr/local/sbin
 install -o root -g wheel -m 0755 "$PKG/bin/devstack-web" "$HELPER_DST"
@@ -21,9 +31,9 @@ chown root:wheel "$SUDOERS_DST"
 
 if ! visudo -cf "$SUDOERS_DST" >/dev/null 2>&1; then
   rm -f "$SUDOERS_DST"
-  echo "sudoers validation failed; removed rule" >&2
+  echo "sudoers validation failed; rule removed" >&2
   exit 1
 fi
 
-echo "installed $HELPER_DST and $SUDOERS_DST for user $TARGET_USER"
+echo "installed $HELPER_DST + $SUDOERS_DST for user $TARGET_USER (from $PKG)"
 "$HELPER_DST" start 2>/dev/null || true
