@@ -4,6 +4,8 @@ A safe, single-command **local development stack for macOS** — nginx + Apache,
 versions), MySQL, PostgreSQL, Redis and Mailpit — with a native GUI app to start/stop everything and
 `*.test` hostnames that just work. No MAMP, no Valet, no GUI environment managers.
 
+![Dev Stack app](docs/app.jpg)
+
 ```
 browser → yourapp.test :80 (nginx)
               └── proxy → 127.0.0.1:8081 (Apache, per-site vhosts, AllowOverride All → real .htaccess)
