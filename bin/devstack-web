@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# devstack-web — privileged helper, installed to /usr/local/sbin/devstack-web.
+# Scope: ONLY nginx (start/stop/restart) and the managed /etc/hosts block.
+# Nothing else is permitted. Installed with a single NOPASSWD sudoers rule.
+set -uo pipefail
+
+RUN_USER="${SUDO_USER:-$(id -un)}"
+RUN_HOME="$(eval echo "~$RUN_USER" 2>/dev/null || echo "$HOME")"
+
+# Homebrew prefix (arm64 vs intel) without invoking brew as root
+if [ -x /opt/homebrew/bin/brew ]; then HP=/opt/homebrew
+elif [ -x /usr/local/bin/brew ]; then HP=/usr/local
+else HP=/opt/homebrew; fi
+BREW="$HP/bin/brew"
+PYTHONISH_PATH="/usr/bin:/bin:/usr/sbin:/sbin:$HP/bin"
+export PATH="$PYTHONISH_PATH"
+
+# Optional user config (ports)
+CFG="$RUN_HOME/.config/devstack/config"
+[ -f "$CFG" ] && . "$CFG" 2>/dev/null || true
+NGINX_PORT="${NGINX_PORT:-80}"
+
+NGINX_SERVERS_DIR="$HP/etc/nginx/servers"
+HOSTS_FILE="/etc/hosts"
+HOSTS_BEGIN="# devstack-begin"
+HOSTS_END="# devstack-end"
+
+info(){ printf '  %s\n' "$*"; }
+ok(){ printf '  ok: %s\n' "$*"; }
+warn(){ printf '  warn: %s\n' "$*" >&2; }
+
+nginx_up(){ /usr/sbin/lsof -nP -iTCP:"$NGINX_PORT" -sTCP:LISTEN >/dev/null 2>&1 && echo up || echo down; }
+
+hosts_sync(){
+  local names
+  names="$(grep -hE '^[[:space:]]*server_name' "$NGINX_SERVERS_DIR"/*.conf 2>/dev/null \
+            | sed -E 's/^[[:space:]]*server_name[[:space:]]+//; s/;//g' \
+            | tr ' ' '\n' | grep -vE '^$|^_$|\*' | sort -u)"
+  [ -n "$names" ] || { warn "no server_name found; /etc/hosts unchanged"; return 0; }
+  sed -i '' "/$HOSTS_BEGIN/,/$HOSTS_END/d" "$HOSTS_FILE" 2>/dev/null || true
+  {
+    echo "$HOSTS_BEGIN"
+    while read -r n; do [ -n "$n" ] && echo "127.0.0.1 $n"; done <<< "$names"
+    echo "$HOSTS_END"
+  } >> "$HOSTS_FILE"
+  ok "synced /etc/hosts ($(echo "$names" | wc -l | tr -d ' ') names)"
+}
+
+case "${1:-}" in
+  start|restart)
+    "$BREW" services restart nginx >/dev/null 2>&1
+    hosts_sync
+    /usr/bin/dscacheutil -flushcache >/dev/null 2>&1 || true
+    /usr/bin/killall -HUP mDNSResponder >/dev/null 2>&1 || true
+    ;;
+  stop)
+    "$BREW" services stop nginx >/dev/null 2>&1
+    ;;
+  status)
+    echo "nginx:$(nginx_up)"
+    exit 0
+    ;;
+  uninstall)
+    "$BREW" services stop nginx >/dev/null 2>&1
+    sed -i '' "/$HOSTS_BEGIN/,/$HOSTS_END/d" "$HOSTS_FILE" 2>/dev/null || true
+    ok "nginx stopped, hosts block removed"
+    ;;
+  *)
+    echo "usage: devstack-web {start|stop|restart|status|uninstall}" >&2
+    exit 2
+    ;;
+esac
+
+sleep 1
+echo "nginx:$(nginx_up)"

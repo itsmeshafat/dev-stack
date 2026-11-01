@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# install-helper-root — installs devstack-web + the scoped sudo rule.
+# Must run as root (invoked via sudo or `osascript ... with administrator privileges`).
+#   install-helper-root <target-user> <package-root>
+set -euo pipefail
+
+TARGET_USER="${1:?target user required}"
+PKG="${2:?package root required}"
+HELPER_DST="/usr/local/sbin/devstack-web"
+SUDOERS_DST="/etc/sudoers.d/devstack"
+
+[ -f "$PKG/bin/devstack-web" ] || { echo "missing $PKG/bin/devstack-web" >&2; exit 1; }
+[ -n "$TARGET_USER" ] && [ "$TARGET_USER" != "root" ] || { echo "refusing to grant root" >&2; exit 1; }
+
+mkdir -p /usr/local/sbin
+install -o root -g wheel -m 0755 "$PKG/bin/devstack-web" "$HELPER_DST"
+
+printf '%s ALL=(root) NOPASSWD: %s\n' "$TARGET_USER" "$HELPER_DST" > "$SUDOERS_DST"
+chmod 0440 "$SUDOERS_DST"
+chown root:wheel "$SUDOERS_DST"
+
+if ! visudo -cf "$SUDOERS_DST" >/dev/null 2>&1; then
+  rm -f "$SUDOERS_DST"
+  echo "sudoers validation failed; removed rule" >&2
+  exit 1
+fi
+
+echo "installed $HELPER_DST and $SUDOERS_DST for user $TARGET_USER"
+"$HELPER_DST" start 2>/dev/null || true

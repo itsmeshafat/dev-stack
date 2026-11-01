@@ -1,0 +1,15 @@
+# --- personal / machine-specific (never commit) ---
+config/sites.conf
+config/config
+*.personal
+
+# --- generated build artifacts ---
+app/Assets/AppIcon.iconset/
+app/Assets/icon-*.png
+build/
+*.app
+
+# --- runtime ---
+backups/
+*.log
+.DS_Store

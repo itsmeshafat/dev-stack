@@ -1,0 +1,12 @@
+# dev-stack sites configuration
+# One site per line:  host | docroot | php | kind | aliases(optional, comma separated)
+# 'kind' is informational (php|laravel|wp|legacy). '#' starts a comment.
+#
+# Copy this file to ~/.config/devstack/sites.conf and edit it, or run:
+#   devstack add-site
+#
+# Example:
+# casepilot.test | ~/Developer/CasePilot/public | 8.3 | laravel
+# jd-blog.test   | ~/Developer/jd-blog/public   | 8.5 | php
+# wptest.test    | ~/Sites/wptest               | 8.5 | wp
+# myapp.test     | ~/Sites/myapp                | 8.5 | laravel | www.myapp.test
