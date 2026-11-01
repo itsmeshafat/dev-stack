@@ -35,6 +35,14 @@ DEV_GROUP="$(id -gn)"
 # ---- ports (overridable via ~/.config/devstack/config) ----
 NGINX_PORT="${NGINX_PORT:-80}"
 APACHE_PORT="${APACHE_PORT:-8081}"
+SSL_PORT="${SSL_PORT:-443}"
+
+# ---- TLS / certs ----
+SSL="${SSL:-0}"
+DEVSTACK_CERT_DIR="$DEVSTACK_HOME/certs"
+DEVSTACK_CERT="$DEVSTACK_CERT_DIR/devstack.test.pem"
+DEVSTACK_CERT_KEY="$DEVSTACK_CERT_DIR/devstack.test-key.pem"
+ssl_enabled() { [ "${SSL:-0}" = "1" ]; }
 
 # ---- php socket namespacing ----
 phpver_socket() {  # 8.5 -> /tmp/devstack-php-85.sock
@@ -75,6 +83,20 @@ load_config() {
   [ -f "$DEVSTACK_CONFIG" ] && . "$DEVSTACK_CONFIG"
   NGINX_PORT="${NGINX_PORT:-80}"
   APACHE_PORT="${APACHE_PORT:-8081}"
+  SSL_PORT="${SSL_PORT:-443}"
+  SSL="${SSL:-0}"
+}
+
+# set_config KEY VALUE — persist an override in ~/.config/devstack/config
+set_config() {
+  local k="$1" v="$2"
+  mkdir -p "$DEVSTACK_CONFIG_DIR"
+  [ -f "$DEVSTACK_CONFIG" ] || : > "$DEVSTACK_CONFIG"
+  if grep -q "^${k}=" "$DEVSTACK_CONFIG" 2>/dev/null; then
+    sed -i '' -E "s#^${k}=.*#${k}=${v}#" "$DEVSTACK_CONFIG"
+  else
+    printf '%s=%s\n' "$k" "$v" >> "$DEVSTACK_CONFIG"
+  fi
 }
 
 ensure_dirs() {

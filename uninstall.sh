@@ -41,6 +41,10 @@ else sudo sed -i '' '/# devstack-begin/,/# devstack-end/d' /etc/hosts 2>/dev/nul
 info "removing generated vhosts"
 run rm -f "$HOMEBREW_PREFIX/etc/nginx/servers/"*.conf "$HOMEBREW_PREFIX/etc/httpd/vhosts/"*.conf 2>/dev/null || true
 
+info "removing dev-stack TLS certificates"
+run rm -rf "$DEVSTACK_CERT_DIR"
+note "mkcert's local CA is left in your keychain; remove it with: mkcert -uninstall"
+
 info "restoring most recent config backup"
 if [ "$DRY_RUN" != "1" ]; then
   last="$(ls -1dt "$DEVSTACK_BACKUP_DIR"/* 2>/dev/null | head -1)"

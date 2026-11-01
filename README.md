@@ -45,6 +45,7 @@
 | 🚫 **DNS with no daemon** | `*.test` names live in a managed `/etc/hosts` block, regenerated from your vhosts. No dnsmasq, no port 53. |
 | 🖥️ **Native control app** | A SwiftUI app to start/stop/restart everything and watch live status. |
 | 🛟 **Safe by design** | `--dry-run`, automatic backups, idempotent install, and a clean uninstall. |
+| 🔒 **Trusted HTTPS** | One wildcard `*.test` certificate via [mkcert](https://github.com/FiloSottile/mkcert); `http://` 301s to `https://`. |
 
 ## Requirements
 
@@ -152,6 +153,7 @@ APACHE_PORT=8081
 | `devstack sites` | List configured sites |
 | `devstack add-site` | Add a site interactively |
 | `devstack sync` | Regenerate vhosts and reload nginx + Apache |
+| `devstack ssl {enable \| disable \| status \| renew}` | Toggle trusted HTTPS for all sites |
 | `devstack composer [--site H \| --php V] …` | Run Composer with the site's PHP, from its project root |
 | `devstack doctor` | Verify formulae, services, configs, helper, and every site |
 

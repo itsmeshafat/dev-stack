@@ -14,6 +14,12 @@ dev-stack is designed to be safe to install, inspect and remove on a working mac
 | `/usr/local/sbin/devstack-web` | the helper (single file) |
 | `/etc/sudoers.d/devstack` | one rule: `NOPASSWD: /usr/local/sbin/devstack-web` |
 | `/Applications/Dev Stack.app` (or `~/Desktop`) | the app |
+| `~/.local/share/devstack/certs/` | TLS cert + private key (mode 0600), only when HTTPS is enabled |
+
+**mkcert CA** — if you enable HTTPS, `mkcert -install` adds a *local development CA* to your login/system
+keychain so browsers trust `*.test` certificates. That's standard for local dev. `uninstall.sh` removes the
+dev-stack certificates but leaves the CA in place (other tools may use it); remove it yourself with
+`mkcert -uninstall` if you want it gone.
 
 It **never** touches files outside these paths.
 

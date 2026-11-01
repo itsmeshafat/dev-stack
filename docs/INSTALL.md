@@ -27,7 +27,17 @@ The installer:
    (`/usr/local/sbin/devstack-web` + one `NOPASSWD` sudoers rule) — **one password prompt**.
 8. Builds and installs the **Dev Stack** app.
 
-Flags: `--dry-run` · `--yes` · `--no-brew` · `--helper-only` · `--app-only` · `--uninstall`.
+Flags: `--dry-run` · `--yes` · `--no-brew` · `--ssl` · `--helper-only` · `--app-only` · `--uninstall`.
+
+## HTTPS
+```bash
+devstack ssl enable     # issue *.test cert (mkcert), redirect :80 → :443, update app URLs
+devstack ssl status     # cert expiry, CA trust, :443 listener
+devstack ssl renew      # re-issue for the current site list
+devstack ssl disable    # back to http only
+```
+Installing with `--ssl` enables it during setup. Laravel `APP_URL` and WordPress `siteurl`/`home` are
+rewritten automatically; other app kinds are left untouched.
 
 ## After install
 ```bash

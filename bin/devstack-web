@@ -19,6 +19,7 @@ export PATH="$PYTHONISH_PATH"
 CFG="$RUN_HOME/.config/devstack/config"
 [ -f "$CFG" ] && . "$CFG" 2>/dev/null || true
 NGINX_PORT="${NGINX_PORT:-80}"
+SSL_PORT="${SSL_PORT:-443}"
 
 NGINX_SERVERS_DIR="$HP/etc/nginx/servers"
 HOSTS_FILE="/etc/hosts"
@@ -30,6 +31,7 @@ ok(){ printf '  ok: %s\n' "$*"; }
 warn(){ printf '  warn: %s\n' "$*" >&2; }
 
 nginx_up(){ /usr/sbin/lsof -nP -iTCP:"$NGINX_PORT" -sTCP:LISTEN >/dev/null 2>&1 && echo up || echo down; }
+ssl_up(){ /usr/sbin/lsof -nP -iTCP:"$SSL_PORT" -sTCP:LISTEN >/dev/null 2>&1 && echo up || echo down; }
 
 hosts_sync(){
   local names
@@ -59,7 +61,7 @@ case "${1:-}" in
     "$BREW" services stop nginx >/dev/null 2>&1
     ;;
   status)
-    echo "nginx:$(nginx_up)"
+    echo "nginx:$(nginx_up) ssl:$(ssl_up)"
     exit 0
     ;;
   uninstall)
@@ -74,4 +76,4 @@ case "${1:-}" in
 esac
 
 sleep 1
-echo "nginx:$(nginx_up)"
+echo "nginx:$(nginx_up) ssl:$(ssl_up)"

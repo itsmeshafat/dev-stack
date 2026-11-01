@@ -17,6 +17,7 @@ PKG_ROOT="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 . "$PKG_ROOT/lib/common.sh"
 . "$PKG_ROOT/lib/modules.sh"
 . "$PKG_ROOT/lib/sites.sh"
+. "$PKG_ROOT/lib/ssl.sh"
 . "$PKG_ROOT/lib/hosts.sh"
 
 INSTALL_PKG="$DEVSTACK_HOME/pkg"
@@ -24,12 +25,13 @@ CLI_LINK="$HOME/.local/bin/devstack"
 HELPER_DST="/usr/local/sbin/devstack-web"
 SUDOERS_DST="/etc/sudoers.d/devstack"
 
-DO_BREW=1; DO_APP=1; DO_MAIN=1; DO_HELPER=1; ASSUME_YES=0
+DO_BREW=1; DO_APP=1; DO_MAIN=1; DO_HELPER=1; DO_SSL=0; ASSUME_YES=0
 for a in "$@"; do case "$a" in
   --dry-run)     DRY_RUN=1 ;;
   --yes|-y)      ASSUME_YES=1 ;;
   --no-brew)     DO_BREW=0 ;;
   --no-helper)   DO_HELPER=0 ;;
+  --ssl)         DO_SSL=1 ;;
   --helper-only) DO_MAIN=0; DO_BREW=0; DO_APP=0 ;;
   --app-only)    DO_MAIN=0; DO_BREW=0; DO_HELPER=0 ;;
   --uninstall)   exec "$PKG_ROOT/uninstall.sh" "${@:2}" ;;
@@ -79,7 +81,7 @@ install_formulae() {
   [ "$DO_BREW" = 1 ] || { info "skipping Homebrew formulae (--no-brew)"; return; }
   info "Homebrew formulae"
   local f
-  for f in nginx httpd mysql@8.4 postgresql@18 redis mailpit php php@8.3 php@7.4 composer wp-cli; do
+  for f in nginx httpd mysql@8.4 postgresql@18 redis mailpit php php@8.3 php@7.4 composer wp-cli mkcert; do
     if "$BREW" list --versions "$f" >/dev/null 2>&1; then note "present: $f"; else
       note "installing: $f"; run "$BREW" install "$f"
     fi
@@ -242,6 +244,13 @@ if [ "$DO_MAIN" = 1 ]; then
   configure_php_fpm
   restart_php
   seed_sites
+  if [ "$DO_SSL" = 1 ]; then
+    info "enabling HTTPS (mkcert)"
+    ssl_install_ca
+    ssl_issue_cert
+    set_config SSL 1
+    SSL=1
+  fi
   sites_sync
   write_nginx_conf
   write_apache_conf

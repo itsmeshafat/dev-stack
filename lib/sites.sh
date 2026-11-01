@@ -41,6 +41,37 @@ sites_hosts() {
 
 _nginx_write() {
   local host="$1" aliases="$2" file="$NGINX_SERVERS_DIR/$host.conf"
+  local names="$host"
+  [ -n "$aliases" ] && names="$host $(printf '%s' "$aliases" | tr ',' ' ')"
+
+  if ssl_enabled; then
+    cat > "$file" <<NGINX
+server {
+    listen ${NGINX_PORT};
+    server_name $names;
+    return 301 https://\$host\$request_uri;
+}
+server {
+    listen ${SSL_PORT} ssl;
+    http2 on;
+    server_name $names;
+    ssl_certificate     "$DEVSTACK_CERT";
+    ssl_certificate_key "$DEVSTACK_CERT_KEY";
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:SSL:10m;
+    location / {
+        proxy_pass http://127.0.0.1:${APACHE_PORT};
+        proxy_set_header Host              \$host;
+        proxy_set_header X-Real-IP         \$remote_addr;
+        proxy_set_header X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_read_timeout 120s;
+    }
+}
+NGINX
+    return
+  fi
+
   {
     echo "server {"
     echo "    listen ${NGINX_PORT};"
@@ -87,6 +118,10 @@ _apache_write() {
 # sites_sync — (re)generate nginx + apache vhosts for every configured site.
 sites_sync() {
   run mkdir -p "$NGINX_SERVERS_DIR" "$HTTPD_VHOSTS_DIR"
+  # ensure the wildcard cert covers any newly added hosts
+  if ssl_enabled && [ "$DRY_RUN" != "1" ] && [ ! -f "$DEVSTACK_CERT" ]; then
+    ssl_issue_cert
+  fi
   # remove previously generated ones (tracked via .devstack-generated marker files)
   if [ "$DRY_RUN" != "1" ]; then
     find "$NGINX_SERVERS_DIR" -name '*.conf' -exec grep -lq 'proxy_pass http://127.0.0.1:' {} \; -delete 2>/dev/null || true

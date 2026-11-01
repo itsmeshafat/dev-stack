@@ -15,6 +15,7 @@ PKG_ROOT="$(cd -P "$(dirname "$SOURCE")/.." && pwd)"
 . "$PKG_ROOT/lib/common.sh"
 . "$PKG_ROOT/lib/modules.sh"
 . "$PKG_ROOT/lib/sites.sh"
+. "$PKG_ROOT/lib/ssl.sh"
 
 load_config
 HELPER="${DEVSTACK_HELPER:-/usr/local/sbin/devstack-web}"
@@ -96,10 +97,26 @@ cmd_doctor() {
   info "privileged helper"
   if [ -x "$HELPER" ]; then ok "$HELPER"; else warn "helper not installed"; fail=1; fi
 
+  info "ssl"
+  if ssl_enabled; then
+    if [ -f "$DEVSTACK_CERT" ]; then ok "certificate present"; else warn "SSL on but no certificate"; fail=1; fi
+    if ssl_ca_ok; then ok "mkcert CA trusted"; else warn "mkcert CA not trusted"; fail=1; fi
+    if port_listening "$SSL_PORT"; then ok "listening :$SSL_PORT"; else warn "nothing on :$SSL_PORT"; fail=1; fi
+  else
+    note "disabled (enable with: devstack ssl enable)"
+  fi
+
   info "sites"
   if [ -f "$DEVSTACK_SITES_CONF" ]; then
+    local scheme="http" port="$NGINX_PORT" cacert=""
+    if ssl_enabled; then scheme="https"; port="$SSL_PORT"; cacert="$(ssl_cacert)"; fi
     while IFS=$'\t' read -r host docroot php kind aliases; do
-      local code; code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 --resolve "$host:${NGINX_PORT}:127.0.0.1" "http://$host:${NGINX_PORT}/" 2>/dev/null)"
+      local code
+      if [ -n "$cacert" ] && [ -f "$cacert" ]; then
+        code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 --cacert "$cacert" --resolve "$host:${port}:127.0.0.1" "$scheme://$host:$port/" 2>/dev/null)"
+      else
+        code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 --resolve "$host:${port}:127.0.0.1" "$scheme://$host:$port/" 2>/dev/null)"
+      fi
       case "$code" in
         2*|3*) printf '  \033[1;32m✓\033[0m %-22s %s\n' "$host" "$code" ;;
         *)     printf '  \033[1;33m!\033[0m %-22s %s\n' "$host" "${code:-no-response}"; fail=1 ;;
@@ -189,6 +206,52 @@ cmd_composer() {
   "$phpbin" "$composer_bin" ${want[@]+"${want[@]}"}
 }
 
+reload_web() {
+  if sudo -n "$HELPER" start >/dev/null 2>&1; then ok "nginx reloaded"; else warn "reload nginx manually (helper unavailable)"; fi
+}
+
+cmd_ssl() {
+  local sub="${1:-status}"
+  case "$sub" in
+    status)
+      info "SSL: $(ssl_summary)"
+      if [ -f "$DEVSTACK_CERT" ]; then
+        note "cert:    $DEVSTACK_CERT"
+        note "expires: $("$OPENSSL" x509 -in "$DEVSTACK_CERT" -noout -enddate 2>/dev/null | cut -d= -f2)"
+        note "sans:    $("$OPENSSL" x509 -in "$DEVSTACK_CERT" -noout -ext subjectAltName 2>/dev/null | tail -1 | sed 's/^ *//')"
+      else
+        note "no certificate issued yet"
+      fi
+      if ssl_ca_ok; then ok "mkcert CA trusted"; else warn "mkcert CA not trusted (run: devstack ssl enable)"; fi
+      if port_listening "$SSL_PORT"; then ok "listening on :$SSL_PORT"; else note "nothing listening on :$SSL_PORT"; fi
+      ;;
+    enable)
+      ssl_install_ca
+      ssl_issue_cert
+      set_config SSL 1
+      SSL=1
+      sites_sync
+      reload_web
+      ssl_app_urls https
+      ok "HTTPS enabled — sites now redirect :$NGINX_PORT → :$SSL_PORT"
+      ;;
+    disable)
+      set_config SSL 0
+      SSL=0
+      sites_sync
+      reload_web
+      ssl_app_urls http
+      ok "HTTPS disabled — sites served over http only"
+      ;;
+    renew)
+      ssl_issue_cert
+      reload_web
+      ok "certificate renewed"
+      ;;
+    *) die "usage: devstack ssl {enable|disable|status|renew}" ;;
+  esac
+}
+
 usage() {
   cat <<EOF
 devstack $DEVSTACK_VERSION — local dev stack control
@@ -205,6 +268,7 @@ Commands:
   add-site               interactively add a site
   sync                   regenerate vhosts + reload nginx/apache
   composer [opts] ...    run Composer with the site's PHP (--site HOST | --php VER)
+  ssl {enable|disable|status|renew}   trusted HTTPS for all sites
   doctor                 verify services, configs, ports, helper, sites
   version                print version
 
@@ -223,6 +287,7 @@ case "$cmd" in
   add-site) cmd_add_site ;;
   sync)     cmd_sync ;;
   composer) shift; cmd_composer "$@" ;;
+  ssl)      shift; cmd_ssl "$@" ;;
   doctor)  cmd_doctor ;;
   version|-v|--version) echo "devstack $DEVSTACK_VERSION" ;;
   -h|--help|help) usage ;;

@@ -35,9 +35,16 @@
 nginx is a thin, fast front door that keeps a single public port and clean URLs. Apache is bound to
 **127.0.0.1 only**, so nothing is exposed beyond the loopback interface.
 
+## TLS
+When HTTPS is enabled (`devstack ssl enable`), **nginx terminates TLS on `:443`** with a single wildcard
+`*.test` certificate issued by mkcert (its local CA is trusted in the keychain). `:80` only issues a `301`
+redirect to `https://`. Apache stays **plain HTTP on loopback** — TLS never reaches it, and nothing new is
+exposed externally. Disabling (`devstack ssl disable`) switches the vhosts back to HTTP-only and flips app
+URLs back to `http`.
+
 ## Ports
-`80` (nginx) · `8081` (Apache) · `3306` (MySQL) · `5432` (PostgreSQL) · `6379` (Redis) ·
-`1025`/`8025` (Mailpit SMTP/UI). All overridable in `~/.config/devstack/config`.
+`80` (nginx) · `443` (nginx TLS, when enabled) · `8081` (Apache) · `3306` (MySQL) · `5432` (PostgreSQL) ·
+`6379` (Redis) · `1025`/`8025` (Mailpit SMTP/UI). All overridable in `~/.config/devstack/config`.
 
 ## DNS without a daemon
 `devstack-web start` reads every `server_name` from the generated nginx vhosts and writes:

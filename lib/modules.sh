@@ -31,7 +31,7 @@ module_detail() {
     php83)    echo "$(phpver_socket 8.3)" ;;
     php74)    echo "$(phpver_socket 7.4)" ;;
     apache)   echo "127.0.0.1:${APACHE_PORT}" ;;
-    web)      echo "nginx :${NGINX_PORT} (hosts-based DNS)" ;;
+    web)      if [ "${SSL:-0}" = "1" ]; then echo "nginx :${NGINX_PORT}/:${SSL_PORT} (hosts-based DNS)"; else echo "nginx :${NGINX_PORT} (hosts-based DNS)"; fi ;;
     *)        echo "" ;;
   esac
 }

@@ -5,6 +5,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$HERE/lib/common.sh"
 . "$HERE/lib/modules.sh"
 . "$HERE/lib/sites.sh"
+. "$HERE/lib/ssl.sh"
 load_config
 
 pass=0; fail=0
@@ -28,10 +29,24 @@ chk_out "apache config valid" "\"$APACHE_BIN\" -t" "Syntax OK"
 echo "== helper =="
 chk "/usr/local/sbin/devstack-web" "[ -x /usr/local/sbin/devstack-web ]"
 
+echo "== ssl =="
+if ssl_enabled; then
+  chk "listening :$SSL_PORT" "lsof -nP -iTCP:$SSL_PORT -sTCP:LISTEN"
+  chk "certificate present" "[ -f \"$DEVSTACK_CERT\" ]"
+else
+  printf '  \033[1;33m!\033[0m ssl disabled\n'
+fi
+
 echo "== sites =="
+scheme="http"; port="$NGINX_PORT"; cacert=""
+if ssl_enabled; then scheme="https"; port="$SSL_PORT"; cacert="$(ssl_cacert)"; fi
 if [ -f "$DEVSTACK_SITES_CONF" ]; then
   while IFS=$'\t' read -r host docroot php kind aliases; do
-    code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 --resolve "$host:$NGINX_PORT:127.0.0.1" "http://$host:$NGINX_PORT/" 2>/dev/null)"
+    if [ -n "$cacert" ] && [ -f "$cacert" ]; then
+      code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 --cacert "$cacert" --resolve "$host:$port:127.0.0.1" "$scheme://$host:$port/" 2>/dev/null)"
+    else
+      code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 --resolve "$host:$port:127.0.0.1" "$scheme://$host:$port/" 2>/dev/null)"
+    fi
     case "$code" in 2*|3*) printf '  \033[1;32m✓\033[0m %-22s %s\n' "$host" "$code"; pass=$((pass+1));;
       *) printf '  \033[1;31m✗\033[0m %-22s %s\n' "$host" "${code:-none}"; fail=$((fail+1));; esac
   done < <(sites_rows)

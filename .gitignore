@@ -12,4 +12,6 @@ build/
 # --- runtime ---
 backups/
 *.log
+*.pem
+*-key.pem
 .DS_Store
