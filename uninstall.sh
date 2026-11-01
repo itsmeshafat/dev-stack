@@ -27,8 +27,12 @@ confirm "Stop all dev-stack services and remove the stack?" || { echo "aborted";
 info "stopping services"
 for m in web apache php74 php83 php85 mail redis postgres mysql; do
   f="$(module_formula "$m" 2>/dev/null || true)"
-  if [ "$m" = "web" ]; then run sudo -n /usr/local/sbin/devstack-web uninstall 2>/dev/null || true; run "$HOMEBREW_PREFIX/bin/brew" services stop nginx 2>/dev/null || true
-  else [ -n "$f" ] && run "$BREW" services stop "$f" 2>/dev/null || true; fi
+  if [ "$m" = "web" ]; then
+    run sudo -n /usr/local/sbin/devstack-web uninstall 2>/dev/null || true
+    run "$HOMEBREW_PREFIX/bin/brew" services stop nginx 2>/dev/null || true
+  elif [ -n "$f" ]; then
+    run "$BREW" services stop "$f" 2>/dev/null || true
+  fi
 done
 
 info "removing privileged helper + sudo rule"
@@ -50,9 +54,9 @@ if [ "$DRY_RUN" != "1" ]; then
   last="$(find "$DEVSTACK_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort -r | head -1)"
   if [ -n "${last:-}" ]; then
     note "from $last"
-    [ -f "$last/hosts" ] && sudo cp "$last/hosts" /etc/hosts 2>/dev/null || true
-    [ -d "$last/nginx" ] && cp -R "$last/nginx/." "$HOMEBREW_PREFIX/etc/nginx/" 2>/dev/null || true
-    [ -d "$last/httpd" ] && cp -R "$last/httpd/." "$HOMEBREW_PREFIX/etc/httpd/" 2>/dev/null || true
+    if [ -f "$last/hosts" ]; then sudo cp "$last/hosts" /etc/hosts 2>/dev/null || true; fi
+    if [ -d "$last/nginx" ]; then cp -R "$last/nginx/." "$HOMEBREW_PREFIX/etc/nginx/" 2>/dev/null || true; fi
+    if [ -d "$last/httpd" ]; then cp -R "$last/httpd/." "$HOMEBREW_PREFIX/etc/httpd/" 2>/dev/null || true; fi
   fi
 fi
 

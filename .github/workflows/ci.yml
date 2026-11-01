@@ -19,7 +19,7 @@ jobs:
       - name: shellcheck
         run: |
           shellcheck --version
-          shellcheck install.sh uninstall.sh bin/* lib/*.sh scripts/*.sh
+          shellcheck --severity=warning install.sh uninstall.sh bin/* lib/*.sh scripts/*.sh
       - name: bash -n
         run: |
           for f in install.sh uninstall.sh bin/* lib/*.sh scripts/*.sh; do

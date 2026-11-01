@@ -63,7 +63,7 @@ cmd_add_site() {
   read -r -p "docroot (e.g. ~/Sites/mysite): " docroot
   read -r -p "php version [8.5]: " php; php="${php:-8.5}"
   read -r -p "kind [php]: " kind; kind="${kind:-php}"
-  [ -n "$host" ] && [ -n "$docroot" ] || { warn "host and docroot are required"; return 1; }
+  if [ -z "$host" ] || [ -z "$docroot" ]; then warn "host and docroot are required"; return 1; fi
   mkdir -p "$DEVSTACK_CONFIG_DIR"
   printf '%s | %s | %s | %s\n' "$host" "$docroot" "$php" "$kind" >> "$DEVSTACK_SITES_CONF"
   ok "added $host"
