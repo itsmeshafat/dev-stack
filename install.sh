@@ -79,7 +79,7 @@ install_formulae() {
   [ "$DO_BREW" = 1 ] || { info "skipping Homebrew formulae (--no-brew)"; return; }
   info "Homebrew formulae"
   local f
-  for f in nginx httpd mysql@8.4 postgresql@18 redis mailpit php php@8.3 php@7.4 wp-cli; do
+  for f in nginx httpd mysql@8.4 postgresql@18 redis mailpit php php@8.3 php@7.4 composer wp-cli; do
     if "$BREW" list --versions "$f" >/dev/null 2>&1; then note "present: $f"; else
       note "installing: $f"; run "$BREW" install "$f"
     fi

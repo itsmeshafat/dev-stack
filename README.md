@@ -117,6 +117,10 @@ Apache is bound to **loopback only** — nothing is exposed beyond your machine.
 
 </details>
 
+> **Tooling** — alongside the services, the installer provisions **`composer`** and **`wp-cli`**.
+> When a project pins an older PHP, run Composer with that PHP:
+> `/opt/homebrew/opt/php@8.3/bin/php "$(command -v composer)" install`
+
 ## Configuration
 
 **`~/.config/devstack/sites.conf`** — one site per line (`|` separated; `kind` and `aliases` optional):
