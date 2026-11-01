@@ -46,7 +46,7 @@ status_all() {
 }
 
 cmd_start()   { log "start ${1:-all}";  if [ -n "${1:-}" ]; then svc_start "$1"; else for m in $MODULES_START; do svc_start "$m"; done; svc_start web; fi; }
-cmd_stop()    { log "stop ${1:-all}";   if [ -n "${1:-}" ]; then svc_stop "$1"; else svc_stop web; for m in $(echo "$MODULES_START" | tr ' ' '\n' | tac); do svc_stop "$m"; done; fi; }
+cmd_stop()    { log "stop ${1:-all}";   if [ -n "${1:-}" ]; then svc_stop "$1"; else for m in $MODULES_STOP; do svc_stop "$m"; done; fi; }
 cmd_restart() { log "restart ${1:-all}"; if [ -n "${1:-}" ]; then svc_stop "$1"; svc_start "$1"; else cmd_stop; cmd_start; fi; }
 
 cmd_sites() {

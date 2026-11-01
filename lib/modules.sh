@@ -3,6 +3,8 @@
 
 # Order matters: databases/cache first, php-fpm, then apache, then nginx (web).
 MODULES_START="mysql postgres redis mail php85 php83 php74 apache"
+# Reverse order for "stop": nginx first, then apache, php-fpm, then data services.
+MODULES_STOP="web apache php74 php83 php85 mail redis postgres mysql"
 MODULES_ALL="$MODULES_START web"
 
 # module -> brew formula ("" for the privileged web module)
