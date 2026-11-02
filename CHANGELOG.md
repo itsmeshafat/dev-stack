@@ -3,6 +3,12 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.3] — 2026-11-02
+
+### Added
+- **Donate link** — a subtle **♥ Donate** button on the right side of the app footer opens
+  <https://www.itsmeshafat.com/donate>. The README and the in-app Help guide link to it too.
+
 ## [1.3.2] — 2026-11-02
 
 ### Added
@@ -103,3 +109,4 @@ All notable changes to this project are documented here. The format follows
 [1.3.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.0
 [1.3.1]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.1
 [1.3.2]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.2
+[1.3.3]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.3

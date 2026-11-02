@@ -255,6 +255,12 @@ More in [`docs/INSTALL.md`](docs/INSTALL.md).
 - [`docs/NOTICE.md`](docs/NOTICE.md) — originality, asset & dependency licensing
 - [`CHANGELOG.md`](CHANGELOG.md) — release history
 
+## Support
+
+If dev-stack saves you time, you can support its development:
+
+**♥ [Donate](https://www.itsmeshafat.com/donate)**
+
 ## Disclaimer
 
 dev-stack is a **local development tool**, provided **“as is”**, without warranty of any kind, express or

@@ -79,6 +79,9 @@ This is a local development tool, provided as-is with no warranty (MIT license).
 databases or project files** — keep your own dumps and use version control. Its automatic backups cover only
 the configuration it rewrites, under `~/.local/share/devstack/backups/`.
 
+## Support
+If this stack saves you time, you can support its development: https://www.itsmeshafat.com/donate
+
 ## Where things live
 | What | Path |
 |---|---|

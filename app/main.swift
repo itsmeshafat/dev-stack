@@ -399,9 +399,20 @@ struct ContentView: View {
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }.frame(height: 92)
-            Text("Local dev tool · provided as-is, no warranty · back up your databases and projects")
-                .font(.system(size: 9))
-                .foregroundColor(.secondary)
+            HStack(spacing: 8) {
+                Text("Local dev tool · provided as-is, no warranty · back up your databases and projects")
+                    .font(.system(size: 9))
+                    .foregroundColor(.secondary)
+                Spacer(minLength: 8)
+                Button(action: {
+                    if let u = URL(string: "https://www.itsmeshafat.com/donate") { NSWorkspace.shared.open(u) }
+                }) {
+                    Text("♥ Donate").font(.system(size: 9, weight: .medium))
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(.accentColor)
+                .help("Donate: https://www.itsmeshafat.com/donate")
+            }
         }
         .padding(12)
     }
