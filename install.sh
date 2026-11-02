@@ -20,6 +20,9 @@ PKG_ROOT="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 . "$PKG_ROOT/lib/ssl.sh"
 . "$PKG_ROOT/lib/hosts.sh"
 
+# respect the user's existing settings (ports, SSL) so a reinstall never downgrades config
+load_config
+
 INSTALL_PKG="$DEVSTACK_HOME/pkg"
 CLI_LINK="$HOME/.local/bin/devstack"
 HELPER_DST="/usr/local/sbin/devstack-web"
