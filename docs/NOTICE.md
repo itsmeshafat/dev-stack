@@ -39,5 +39,11 @@ repository and each remains under its own license and copyright, including (veri
 "Apple", "macOS", "Homebrew", "Laravel", "WordPress", "nginx", "Apache", "MySQL", "PostgreSQL", "Redis" and
 other names are trademarks of their respective owners. This project is not affiliated with or endorsed by them.
 
-## No warranty
-Provided "as is", without warranty of any kind — see [LICENSE](LICENSE).
+## Disclaimer
+Provided **“as is”**, without warranty of any kind, express or implied. The authors are **not liable** for data
+loss, service interruption, or any other damage arising from use — see [LICENSE](../LICENSE) and the
+[README disclaimer](../README.md#disclaimer).
+
+dev-stack **does not back up your databases or project files**. Its automatic backups cover only the
+configuration it rewrites (`/etc/hosts`, nginx/Apache configs, php-fpm `www.conf`). Keep your own database
+dumps and keep projects in version control.

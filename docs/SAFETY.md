@@ -28,6 +28,13 @@ dev-stack certificates but leaves the CA in place (other tools may use it); remo
 
 It **never** touches files outside these paths.
 
+## Your data
+dev-stack **does not copy your databases or project files**. Its backups cover only the configuration it
+rewrites (`/etc/hosts`, nginx/Apache configs, php-fpm `www.conf`). Before anything destructive — database
+migrations, `uninstall.sh`, `DROP`, `rm` — take your own dump/backup (`mysqldump`, `pg_dump`,
+`redis-cli --rdb`) and keep projects in version control. Provided **as is**, no warranty — see the
+[README disclaimer](../README.md#disclaimer).
+
 ## Guardrails
 - **`--dry-run`** prints every action and changes nothing (verify before trusting).
 - **Backups** — every file that would be overwritten is copied to

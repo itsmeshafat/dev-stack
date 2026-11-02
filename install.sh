@@ -241,6 +241,7 @@ summary() {
   note "backups:  $DEVSTACK_BACKUP_DIR/$BACKUP_TS"
   note "next:     devstack doctor    (verify)   |   devstack start (bring it up)"
   note "uninstall: $PKG_ROOT/uninstall.sh"
+  note "disclaimer: provided as-is, no warranty — back up your databases and project files"
 }
 
 # ---------------------------------------------------------------- run

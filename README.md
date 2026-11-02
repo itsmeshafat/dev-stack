@@ -224,6 +224,8 @@ kept for rollback (last 3), and `devstack sync` stays the explicit opt-in for vh
 - **Least privilege** — the only privileged surface is one helper script (restart nginx + rewrite the hosts
   block) behind a single `NOPASSWD` rule. No general `sudo`.
 - **Clean removal** — `./uninstall.sh` stops services, removes the helper, restores backups.
+- **No warranty; back up your data** — see the [Disclaimer](#disclaimer). dev-stack does **not** back up
+  databases or project files.
 
 <details>
 <summary><b>Troubleshooting</b></summary>
@@ -252,6 +254,20 @@ More in [`docs/INSTALL.md`](docs/INSTALL.md).
 - [`SECURITY.md`](SECURITY.md) — privileged surface, threat model, reporting
 - [`docs/NOTICE.md`](docs/NOTICE.md) — originality, asset & dependency licensing
 - [`CHANGELOG.md`](CHANGELOG.md) — release history
+
+## Disclaimer
+
+dev-stack is a **local development tool**, provided **“as is”**, without warranty of any kind, express or
+implied — see the [MIT License](LICENSE). You use it at your own risk.
+
+- It runs services, edits `/etc/hosts`, installs a scoped privileged helper, and generates web-server
+  configuration on **your** machine.
+- **It does not back up your databases or project files.** Take your own backups (`mysqldump`, `pg_dump`,
+  `redis-cli --rdb`, git) before migrating, uninstalling, or anything destructive.
+- Its automatic backups cover only the **configuration it rewrites** (`/etc/hosts`, nginx/Apache configs,
+  php-fpm `www.conf`) in `~/.local/share/devstack/backups/`. It cannot recover data that was never backed up.
+- The authors are **not liable** for data loss, service interruption, or any other damage arising from use.
+- Review `./install.sh --dry-run` first, and keep your projects under version control.
 
 ## License
 

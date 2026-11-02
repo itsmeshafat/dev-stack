@@ -74,6 +74,11 @@ An update replaces only the app code and the app bundle — plus the privileged 
 | Wrong PHP version | fix the php column, then devstack sync |
 | A module won't start | the console shows the underlying brew error |
 
+## Disclaimer
+This is a local development tool, provided as-is with no warranty (MIT license). It **does not back up your
+databases or project files** — keep your own dumps and use version control. Its automatic backups cover only
+the configuration it rewrites, under `~/.local/share/devstack/backups/`.
+
 ## Where things live
 | What | Path |
 |---|---|

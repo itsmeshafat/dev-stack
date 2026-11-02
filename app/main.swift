@@ -399,6 +399,9 @@ struct ContentView: View {
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }.frame(height: 92)
+            Text("Local dev tool · provided as-is, no warranty · back up your databases and projects")
+                .font(.system(size: 9))
+                .foregroundColor(.secondary)
         }
         .padding(12)
     }
