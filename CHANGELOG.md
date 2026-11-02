@@ -3,6 +3,16 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.4] — 2026-11-02
+
+### Added
+- Donate link in more places: the `devstack --help` footer, the installer summary, `docs/INSTALL.md`, and a
+  **Donate…** item in the app menu (the app footer button and the Help guide already had it).
+
+### Changed
+- `.github/FUNDING.yml` now points only at <https://www.itsmeshafat.com/donate> — the old supportkori link was
+  removed.
+
 ## [1.3.3] — 2026-11-02
 
 ### Added
@@ -110,3 +120,4 @@ All notable changes to this project are documented here. The format follows
 [1.3.1]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.1
 [1.3.2]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.2
 [1.3.3]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.3
+[1.3.4]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.4

@@ -242,6 +242,7 @@ summary() {
   note "next:     devstack doctor    (verify)   |   devstack start (bring it up)"
   note "uninstall: $PKG_ROOT/uninstall.sh"
   note "disclaimer: provided as-is, no warranty — back up your databases and project files"
+  note "support:    ♥ https://www.itsmeshafat.com/donate"
 }
 
 # ---------------------------------------------------------------- run

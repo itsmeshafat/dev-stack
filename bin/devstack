@@ -312,6 +312,7 @@ Commands:
   version                print version
 
 Modules: mysql postgres redis mail php85 php83 php74 apache web
+Support: ♥ https://www.itsmeshafat.com/donate
 EOF
 }
 

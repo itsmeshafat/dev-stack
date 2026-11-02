@@ -108,3 +108,6 @@ running services. Version is verified before the swap; the last 3 versions are k
 devstack doctor          # formulae, services, nginx -t, httpd -t, helper, every site
 scripts/smoke-test.sh    # ports + HTTP status for all sites
 ```
+
+## Support
+If dev-stack saves you time, you can support its development: **♥ https://www.itsmeshafat.com/donate**

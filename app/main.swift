@@ -570,6 +570,9 @@ struct DevStackApp: App {
             CommandGroup(after: .appInfo) {
                 Button("Check for Updates…") { ctl.checkForUpdates(force: true) }
                     .keyboardShortcut("u", modifiers: .command)
+                Button("Donate…") {
+                    if let u = URL(string: "https://www.itsmeshafat.com/donate") { NSWorkspace.shared.open(u) }
+                }
             }
         }
     }
