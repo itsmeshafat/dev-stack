@@ -3,6 +3,22 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] — 2026-11-02
+
+### Added
+- **Update pipeline** — the app checks for a new release when it launches and shows an **Update available**
+  banner (Update now · Release notes · Dismiss), plus **Check for Updates…** (⌘U) in the app menu.
+- **Safe self-update** — `devstack update` downloads the release tarball, verifies the version, atomically
+  swaps the installed package (keeping the last 3 backups), rebuilds the app, and updates the privileged
+  helper **only if it changed** (a single admin prompt). Sites, config, certificates, hosts, vhosts,
+  databases and running services are never touched.
+- `devstack update --check [--json]` and `devstack update --rollback`.
+
+### Safety
+- Version is verified **before** the swap; the swap is an atomic rename (no partial state, the running
+  script stays valid), and the previous version is retained for rollback.
+- Vhost-template changes stay opt-in via `devstack sync`.
+
 ## [1.2.0] — 2026-11-02
 
 ### Added
@@ -70,3 +86,4 @@ All notable changes to this project are documented here. The format follows
 [1.0.2]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.0.2
 [1.1.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.1.0
 [1.2.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.2.0
+[1.3.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.0

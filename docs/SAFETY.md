@@ -15,6 +15,11 @@ dev-stack is designed to be safe to install, inspect and remove on a working mac
 | `/etc/sudoers.d/devstack` | one rule: `NOPASSWD: /usr/local/sbin/devstack-web` |
 | `/Applications/Dev Stack.app` (or `~/Desktop`) | the app |
 | `~/.local/share/devstack/certs/` | TLS cert + private key (mode 0600), only when HTTPS is enabled |
+| `~/.local/share/devstack/pkg-backups/` | previous versions kept for `devstack update --rollback` (last 3) |
+
+**Updates** (`devstack update`) replace only `~/.local/share/devstack/pkg` and the app bundle (and the helper
+if it changed). They do **not** touch `~/.config/devstack`, certificates, `/etc/hosts`, vhosts, databases or
+running services. The version is verified before an atomic swap; the previous version is retained.
 
 **mkcert CA** — if you enable HTTPS, `mkcert -install` adds a *local development CA* to your login/system
 keychain so browsers trust `*.test` certificates. That's standard for local dev. `uninstall.sh` removes the

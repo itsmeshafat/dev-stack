@@ -80,6 +80,19 @@ myapp.test | ~/Sites/myapp/public | 8.5 | laravel
 Existing projects are pointed the same way — nothing is moved or copied. `kind` only affects the URL rewrite
 done by `devstack ssl enable/disable`.
 
+## Updates
+
+```bash
+devstack update --check     # newer release available?
+devstack update             # download, verify, swap, rebuild the app
+devstack update --rollback  # restore the previous version
+```
+
+The app shows an **Update available** banner at launch (and **Check for Updates…** in the menu, ⌘U).
+An update replaces only the installed package, the app bundle, and — if it changed — the privileged helper
+(one admin prompt). It never touches `sites.conf`, config, certificates, `/etc/hosts`, vhosts, databases or
+running services. Version is verified before the swap; the last 3 versions are kept for rollback.
+
 ## Troubleshooting
 | Symptom | Fix |
 |---|---|

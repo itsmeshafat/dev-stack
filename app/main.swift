@@ -13,6 +13,12 @@ struct ModuleStatus: Identifiable {
     var isPartial: Bool { state == "partial" }
 }
 
+struct UpdateInfo {
+    let current: String
+    let latest: String
+    let url: String
+}
+
 // MARK: - Controller
 // Talks to the installed CLI at ~/.local/bin/devstack (single source of truth).
 
@@ -24,6 +30,9 @@ final class StackController: ObservableObject {
     @Published var lastAction: String = ""
     @Published var helperReady: Bool = false
     @Published var cliReady: Bool = false
+    @Published var update: UpdateInfo?
+    @Published var updateDismissed: Bool = false
+    @Published var updatedTo: String?
 
     let home: String
     let cliPath: String
@@ -36,6 +45,7 @@ final class StackController: ObservableObject {
         cliReady = FileManager.default.isExecutableFile(atPath: cliPath)
         loadStatus()
         checkHelper()
+        checkForUpdates()
     }
 
     private func exec(_ args: [String]) -> String {
@@ -92,32 +102,104 @@ final class StackController: ObservableObject {
         }
     }
 
+    // MARK: updates
+
+    func checkForUpdates(force: Bool = false) {
+        guard cliReady else { return }
+        var args = ["update", "--check", "--json"]
+        if force { args.append("--refresh") }
+        DispatchQueue.global(qos: .utility).async {
+            let out = self.exec(args)
+            guard let data = out.data(using: .utf8),
+                  let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let available = obj["available"] as? Bool, available,
+                  let latest = obj["latest"] as? String else { return }
+            let info = UpdateInfo(current: obj["current"] as? String ?? "",
+                                  latest: latest,
+                                  url: obj["url"] as? String ?? "")
+            DispatchQueue.main.async {
+                if self.updatedTo == nil {
+                    self.update = info
+                    self.updateDismissed = false
+                }
+            }
+        }
+    }
+
+    func dismissUpdate() { updateDismissed = true }
+
+    /// Runs `devstack update` (app + CLI). The helper is updated through the admin prompt only if it changed.
+    func performUpdate() {
+        guard !busy, cliReady else { return }
+        busy = true
+        lastAction = "update"
+        let target = update?.latest ?? ""
+        DispatchQueue.global(qos: .userInitiated).async {
+            var out = self.exec(["update", "--yes", "--no-helper"])
+            if out.contains("HELPER_UPDATE_REQUIRED") {
+                out += "\n\nUpdating the privileged helper (admin prompt)…\n"
+                out += self.adminHelperInstall()
+            }
+            let mods = self.parse(self.exec(["status"]))
+            let ver = self.exec(["version"]).trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "devstack ", with: "")
+            DispatchQueue.main.async {
+                self.output = out
+                self.apply(mods)
+                self.busy = false
+                if out.contains("updated ") {
+                    self.updatedTo = target.isEmpty ? ver : target
+                    self.update = nil
+                    self.helperReady = FileManager.default.fileExists(atPath: "/usr/local/sbin/devstack-web")
+                }
+            }
+        }
+    }
+
+    func relaunch() {
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+        p.arguments = ["-n", "/Applications/Dev Stack.app"]
+        try? p.run()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            NSApplication.shared.terminate(nil)
+        }
+    }
+
+    // MARK: privileged helper
+
     /// Install the privileged helper via the macOS admin prompt (no Terminal needed).
     func installPrivileged() {
         guard !busy else { return }
         busy = true
         lastAction = "install privileged helper"
-        let user = NSUserName()
-        let shellCmd = "/bin/bash \(pkgDir)/bin/install-helper-root \(user) \(pkgDir)"
         DispatchQueue.global(qos: .userInitiated).async {
-            let p = Process()
-            p.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
-            p.arguments = ["-e", "do shell script " + self.asQuote(shellCmd) + " with administrator privileges"]
-            let pipe = Pipe()
-            p.standardOutput = pipe; p.standardError = pipe
-            var out = ""
-            do {
-                try p.run()
-                let d = pipe.fileHandleForReading.readDataToEndOfFile()
-                p.waitUntilExit()
-                out = String(data: d, encoding: .utf8) ?? ""
-                if p.terminationStatus != 0 { out += "\n(exit \(p.terminationStatus))" }
-            } catch { out = "failed: \(error.localizedDescription)" }
+            let out = self.adminHelperInstall()
             let mods = self.parse(self.exec(["status"]))
             let helper = FileManager.default.fileExists(atPath: "/usr/local/sbin/devstack-web")
             DispatchQueue.main.async {
                 self.output = out; self.apply(mods); self.helperReady = helper; self.busy = false
             }
+        }
+    }
+
+    private func adminHelperInstall() -> String {
+        let user = NSUserName()
+        let shellCmd = "/bin/bash \(pkgDir)/bin/install-helper-root \(user) \(pkgDir)"
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+        p.arguments = ["-e", "do shell script " + asQuote(shellCmd) + " with administrator privileges"]
+        let pipe = Pipe()
+        p.standardOutput = pipe; p.standardError = pipe
+        do {
+            try p.run()
+            let d = pipe.fileHandleForReading.readDataToEndOfFile()
+            p.waitUntilExit()
+            var out = String(data: d, encoding: .utf8) ?? ""
+            if p.terminationStatus != 0 { out += "\n(exit \(p.terminationStatus))" }
+            return out
+        } catch {
+            return "failed: \(error.localizedDescription)"
         }
     }
 
@@ -195,6 +277,14 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 0) {
             header
+            if let u = ctl.update, !ctl.updateDismissed {
+                Divider()
+                updateBanner(u)
+            }
+            if let v = ctl.updatedTo {
+                Divider()
+                updatedBanner(v)
+            }
             Divider()
             list
             Divider()
@@ -227,6 +317,40 @@ struct ContentView: View {
             }
         }
         .padding(16)
+    }
+
+    private func updateBanner(_ u: UpdateInfo) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "arrow.down.circle.fill").foregroundColor(.accentColor)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Update available — v\(u.current) → v\(u.latest)")
+                    .font(.system(size: 12, weight: .medium))
+                Text("Only app code is replaced. Sites, config, certificates and services are untouched.")
+                    .font(.system(size: 10)).foregroundColor(.secondary)
+            }
+            Spacer(minLength: 8)
+            if let url = URL(string: u.url), !u.url.isEmpty {
+                Button("Release notes") { NSWorkspace.shared.open(url) }
+            }
+            Button("Dismiss") { ctl.dismissUpdate() }
+            Button(action: { ctl.performUpdate() }) { Label("Update now", systemImage: "arrow.down.app") }
+                .disabled(ctl.busy)
+        }
+        .padding(12)
+        .background(Color.accentColor.opacity(0.08))
+    }
+
+    private func updatedBanner(_ v: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+            Text("Updated to v\(v). Relaunch to use it.")
+                .font(.system(size: 12, weight: .medium))
+            Spacer()
+            Button("Relaunch") { ctl.relaunch() }
+            Button("Later") { ctl.updatedTo = nil }
+        }
+        .padding(12)
+        .background(Color.green.opacity(0.10))
     }
 
     private var list: some View {
@@ -428,6 +552,10 @@ struct DevStackApp: App {
             CommandGroup(replacing: .help) {
                 Button("Dev Stack Help") { help.show = true }
                     .keyboardShortcut("?", modifiers: .command)
+            }
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") { ctl.checkForUpdates(force: true) }
+                    .keyboardShortcut("u", modifiers: .command)
             }
         }
     }

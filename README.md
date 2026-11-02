@@ -185,6 +185,22 @@ column only controls what `devstack ssl enable` rewrites (Laravel `APP_URL`, Wor
 > [`docs/HELP.md`](docs/HELP.md) in a window. The guide is bundled at build time, so app and docs stay in sync
 > from one file.
 
+## Updates
+
+The app checks for a new release **at launch**; when one exists you get an **Update available** banner with
+**Update now** · **Release notes** · **Dismiss**, and **Check for Updates…** is in the app menu (**⌘U**).
+
+```bash
+devstack update --check     # is there a newer release?
+devstack update             # apply it
+devstack update --rollback  # restore the previous version
+```
+
+An update replaces **only** `~/.local/share/devstack/pkg`, the app bundle, and — only if it changed — the
+privileged helper (one admin prompt). Your `sites.conf`, config, certificates, `/etc/hosts`, vhosts, databases
+and running services are **never** touched. The version is verified before the swap, the previous version is
+kept for rollback (last 3), and `devstack sync` stays the explicit opt-in for vhost-template changes.
+
 ## Commands
 
 | Command | What it does |
@@ -195,6 +211,7 @@ column only controls what `devstack ssl enable` rewrites (Laravel `APP_URL`, Wor
 | `devstack add-site` | Add a site interactively |
 | `devstack sync` | Regenerate vhosts and reload nginx + Apache |
 | `devstack ssl {enable \| disable \| status \| renew}` | Toggle trusted HTTPS for all sites |
+| `devstack update [--check \| --rollback]` | Check for / apply a release safely |
 | `devstack composer [--site H \| --php V] …` | Run Composer with the site's PHP, from its project root |
 | `devstack doctor` | Verify formulae, services, configs, helper, and every site |
 

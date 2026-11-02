@@ -40,6 +40,11 @@ instead of being written into nginx/Apache configuration.
 - No credentials are stored by dev-stack. Database/API credentials remain in your projects' own `.env` files.
 - The installer backs up every file it changes before touching it.
 
+## Updates
+`devstack update` downloads the release tarball from GitHub over **HTTPS**, checks that the archive's
+`DEVSTACK_VERSION` matches the release tag **before** swapping anything, and keeps the previous version for
+rollback. It never writes to `~/.config/devstack`, certificates, `/etc/hosts`, vhosts or databases.
+
 ## Local certificate authority
 Enabling HTTPS installs **mkcert's local development CA** into your keychain (standard for local dev). It is
 a *development* CA, trusted only on this machine. Remove it with `mkcert -uninstall`.

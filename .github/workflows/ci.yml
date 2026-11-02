@@ -58,3 +58,8 @@ jobs:
         run: |
           ./install.sh --dry-run --no-brew --no-helper
           echo "dry-run exit: $?"
+
+      - name: Update check (offline fixture)
+        run: |
+          printf '%s' '{"tag_name":"v0.0.1","html_url":"https://github.com/itsmeshafat/dev-stack/releases/tag/v0.0.1","prerelease":false}' > /tmp/api.json
+          DEVSTACK_UPDATE_API=file:///tmp/api.json bash bin/devstack update --check --json | python3 -m json.tool

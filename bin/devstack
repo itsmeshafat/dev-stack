@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # devstack — user-facing control CLI for the macOS dev stack.
-# start|stop|restart|status|list|sites|add-site|doctor|version
+# start|stop|restart|status|list|sites|add-site|sync|composer|ssl|update|doctor|version
 set -uo pipefail
 
 # Resolve package root even when invoked through a symlink (~/.local/bin/devstack).
@@ -16,6 +16,7 @@ PKG_ROOT="$(cd -P "$(dirname "$SOURCE")/.." && pwd)"
 . "$PKG_ROOT/lib/modules.sh"
 . "$PKG_ROOT/lib/sites.sh"
 . "$PKG_ROOT/lib/ssl.sh"
+. "$PKG_ROOT/lib/update.sh"
 
 load_config
 HELPER="${DEVSTACK_HELPER:-/usr/local/sbin/devstack-web}"
@@ -102,6 +103,13 @@ cmd_doctor() {
 
   info "privileged helper"
   if [ -x "$HELPER" ]; then ok "$HELPER"; else warn "helper not installed"; fail=1; fi
+
+  info "update"
+  local avail; avail="$(update_check json 0 2>/dev/null)"
+  case "$avail" in
+    *'"available":true'*) ok "a newer release is available (devstack update)" ;;
+    *)                    ok "up to date ($DEVSTACK_VERSION)" ;;
+  esac
 
   info "ssl"
   if ssl_enabled; then
@@ -258,6 +266,29 @@ cmd_ssl() {
   esac
 }
 
+cmd_update() {
+  local check=0 json=0 yes=0 allow_helper=1 refresh=0
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --check)     check=1 ;;
+      --json)      json=1 ;;
+      --yes|-y)    yes=1 ;;
+      --no-helper) allow_helper=0 ;;
+      --refresh)   refresh=1 ;;
+      --rollback)  update_rollback; return $? ;;
+      -h|--help)   note "usage: devstack update [--check] [--json] [--refresh] [--yes] [--no-helper] | --rollback"; return 0 ;;
+      *) die "unknown option: $1" ;;
+    esac
+    shift
+  done
+  if [ "$check" = "1" ]; then
+    local mode="human"; [ "$json" = "1" ] && mode="json"
+    update_check "$mode" "$refresh"
+  else
+    update_apply "$yes" "$allow_helper"
+  fi
+}
+
 usage() {
   cat <<EOF
 devstack $DEVSTACK_VERSION — local dev stack control
@@ -275,6 +306,8 @@ Commands:
   sync                   regenerate vhosts + reload nginx/apache
   composer [opts] ...    run Composer with the site's PHP (--site HOST | --php VER)
   ssl {enable|disable|status|renew}   trusted HTTPS for all sites
+  update [--check]       check for a new release (--check --json for the app)
+  update --rollback      restore the previous version
   doctor                 verify services, configs, ports, helper, sites
   version                print version
 
@@ -294,6 +327,7 @@ case "$cmd" in
   sync)     cmd_sync ;;
   composer) shift; cmd_composer "$@" ;;
   ssl)      shift; cmd_ssl "$@" ;;
+  update)   shift; cmd_update "$@" ;;
   doctor)  cmd_doctor ;;
   version|-v|--version) echo "devstack $DEVSTACK_VERSION" ;;
   -h|--help|help) usage ;;

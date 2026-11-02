@@ -40,6 +40,19 @@ Nothing is moved or copied. Add one line pointing at its document root and run d
 
 The "kind" column only controls what SSL toggling rewrites: Laravel APP_URL, WordPress siteurl/home.
 
+## Updates
+The app checks for a newer release at launch and shows an Update banner (Update now · Release notes ·
+Dismiss). You can also check manually from the app menu (⌘U).
+
+```
+devstack update --check
+devstack update
+devstack update --rollback
+```
+
+An update replaces only the app code and the app bundle — plus the privileged helper only if it changed
+(one admin prompt). Sites, config, certificates, hosts and running services are never touched.
+
 ## Commands
 | Command | Does |
 |---|---|
