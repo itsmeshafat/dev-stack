@@ -3,6 +3,13 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.5] — 2026-11-02
+
+### Changed
+- **`devstack.log` now records the caller** of every service action, e.g.
+  `stop all [pid=8467 via=DevStack<launchd>]` vs `via=zsh<Terminal>`, so it is unambiguous whether a start/stop
+  came from the app, a terminal, or an automation.
+
 ## [1.3.4] — 2026-11-02
 
 ### Added
@@ -121,3 +128,4 @@ All notable changes to this project are documented here. The format follows
 [1.3.2]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.2
 [1.3.3]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.3
 [1.3.4]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.4
+[1.3.5]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.5

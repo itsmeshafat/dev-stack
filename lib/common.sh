@@ -2,7 +2,7 @@
 # lib/common.sh — environment detection, config, logging, dry-run helpers.
 # Sourced by bin/devstack, bin/devstack-web and install.sh. Not executed directly.
 
-DEVSTACK_VERSION="1.3.4"
+DEVSTACK_VERSION="1.3.5"
 
 # ---- resolvable paths (all HOME/brew-prefix relative, no machine hardcoding) ----
 DEVSTACK_HOME="${DEVSTACK_HOME:-$HOME/.local/share/devstack}"
@@ -59,7 +59,13 @@ phpver_formula() { # 8.5 -> php, 8.3 -> php@8.3
 DRY_RUN="${DRY_RUN:-0}"
 QUIET="${QUIET:-0}"
 
-log() { printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >>"$DEVSTACK_LOG" 2>/dev/null; }
+log() {
+  local via gp
+  via="$(ps -o comm= -p "${PPID:-0}" 2>/dev/null)"; via="${via##*/}"
+  gp="$(ps -o ppid= -p "${PPID:-0}" 2>/dev/null | tr -d ' ')"
+  gp="$(ps -o comm= -p "${gp:-0}" 2>/dev/null)"; gp="${gp##*/}"
+  printf '%s %s [pid=%s via=%s<%s>]\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" "$$" "${via:-?}" "${gp:-?}" >>"$DEVSTACK_LOG" 2>/dev/null
+}
 info() { [ "$QUIET" = 1 ] || printf '\033[1;34m▸\033[0m %s\n' "$*"; }
 note() { [ "$QUIET" = 1 ] || printf '  %s\n' "$*"; }
 ok()   { [ "$QUIET" = 1 ] || printf '\033[1;32m✓\033[0m %s\n' "$*"; }
