@@ -3,6 +3,13 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] — 2026-11-02
+
+### Added
+- **Help menu item** — *Dev Stack Help* in the macOS Help menu (**⌘?**) opens the guide from anywhere in the app.
+- **Docs-driven help** — the in-app guide is now rendered from **`docs/HELP.md`**, bundled into the app at build
+  time, so the documentation and the app stay in sync from a single file.
+
 ## [1.1.0] — 2026-11-02
 
 ### Added
@@ -62,3 +69,4 @@ All notable changes to this project are documented here. The format follows
 [1.0.1]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.0.1
 [1.0.2]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.0.2
 [1.1.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.1.0
+[1.2.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.2.0

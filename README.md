@@ -181,8 +181,9 @@ myapp.test | ~/Sites/myapp/public | 8.5 | laravel
 Pointing an **existing** project here is the same single line — nothing is moved or copied. The `kind`
 column only controls what `devstack ssl enable` rewrites (Laravel `APP_URL`, WordPress `siteurl`/`home`).
 
-> The **Dev Stack** app has a **Help** button that opens this guide in a window, so you don't need the README
-> for day-to-day use.
+> The **Dev Stack** app has a **Help** button — and **Help → Dev Stack Help** (⌘?) — which renders
+> [`docs/HELP.md`](docs/HELP.md) in a window. The guide is bundled at build time, so app and docs stay in sync
+> from one file.
 
 ## Commands
 
@@ -228,6 +229,7 @@ More in [`docs/INSTALL.md`](docs/INSTALL.md).
 ## Docs
 
 - [`docs/INSTALL.md`](docs/INSTALL.md) — install, flags, troubleshooting
+- [`docs/HELP.md`](docs/HELP.md) — the in-app guide (also shown in the app via **Help** / ⌘?)
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — how the pieces fit
 - [`docs/SAFETY.md`](docs/SAFETY.md) — exactly what it touches on your machine
 - [`SECURITY.md`](SECURITY.md) — privileged surface, threat model, reporting

@@ -31,6 +31,8 @@ echo "== bundle =="
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$HERE/Assets/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
+# bundle the single-source help document (docs/HELP.md) into the app
+cp "$HERE/../docs/HELP.md" "$APP/Contents/Resources/HELP.md"
 
 echo "== compile =="
 /usr/bin/swiftc -O -parse-as-library -o "$APP/Contents/MacOS/DevStack" "$HERE/main.swift" \
@@ -44,8 +46,8 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
   <key>CFBundleName</key><string>Dev Stack</string>
   <key>CFBundleDisplayName</key><string>Dev Stack</string>
   <key>CFBundleIdentifier</key><string>io.github.devstack.app</string>
-  <key>CFBundleVersion</key><string>1.1.0</string>
-  <key>CFBundleShortVersionString</key><string>1.1.0</string>
+  <key>CFBundleVersion</key><string>1.2.0</string>
+  <key>CFBundleShortVersionString</key><string>1.2.0</string>
   <key>CFBundleExecutable</key><string>DevStack</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
