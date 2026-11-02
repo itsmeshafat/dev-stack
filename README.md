@@ -261,6 +261,8 @@ If dev-stack saves you time, you can support its development:
 
 **♥ [Donate](https://www.itsmeshafat.com/donate)**
 
+GitHub also shows a **Sponsor** button on the repository (via [`.github/FUNDING.yml`](.github/FUNDING.yml)).
+
 ## Disclaimer
 
 dev-stack is a **local development tool**, provided **“as is”**, without warranty of any kind, express or
