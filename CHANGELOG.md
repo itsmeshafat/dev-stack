@@ -3,6 +3,17 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] — 2026-11-02
+
+### Fixed
+- **Service failures are no longer silent.** `devstack start`/`stop` now surface the underlying
+  `brew services` error instead of appearing to do nothing. (A stale `my.cnf` include directory made MySQL
+  refuse to start while the CLI printed nothing.)
+
+### Verified
+- Full start/stop matrix: every module stops and starts cleanly; **Stop All** closes all listeners
+  (`:80/:443/:8081/:3306/:5432/:6379`); **Start All** brings all 9 modules back and sites serve 200/302.
+
 ## [1.0.1] — 2026-11-01
 
 ### Fixed
@@ -40,3 +51,4 @@ All notable changes to this project are documented here. The format follows
 
 [1.0.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.0.0
 [1.0.1]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.0.1
+[1.0.2]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.0.2
