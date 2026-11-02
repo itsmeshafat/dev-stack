@@ -153,6 +153,37 @@ NGINX_PORT=80
 APACHE_PORT=8081
 ```
 
+## Adding a site
+
+There is **no fixed web root** — every site is one line in `~/.config/devstack/sites.conf`.
+
+```bash
+devstack add-site        # interactive: host, docroot, php, kind
+devstack sync            # regenerate vhosts + /etc/hosts, reload servers
+devstack doctor          # verify everything
+```
+
+Or append a line yourself:
+
+```ini
+myapp.test | ~/Sites/myapp/public | 8.5 | laravel
+```
+
+**Which folder is the document root?**
+
+| Project type | Docroot |
+|---|---|
+| Laravel / Symfony | `<project>/public` |
+| WordPress | the folder containing `wp-config.php` |
+| Plain PHP / legacy | the folder containing `index.php` |
+| Root `.htaccess` forwarding into `public/` | the project root |
+
+Pointing an **existing** project here is the same single line — nothing is moved or copied. The `kind`
+column only controls what `devstack ssl enable` rewrites (Laravel `APP_URL`, WordPress `siteurl`/`home`).
+
+> The **Dev Stack** app has a **Help** button that opens this guide in a window, so you don't need the README
+> for day-to-day use.
+
 ## Commands
 
 | Command | What it does |

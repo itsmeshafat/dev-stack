@@ -54,6 +54,32 @@ devstack composer install                             # auto-detected from $PWD
 devstack composer --php 7.4 -- --version              # explicit PHP
 ```
 
+## Adding a project
+
+No fixed web root — register the site and apply:
+
+```bash
+devstack add-site     # host, docroot, php, kind
+devstack sync         # regenerate vhosts + /etc/hosts, reload nginx/apache
+devstack doctor       # verify
+```
+
+Or add a line to `~/.config/devstack/sites.conf`:
+
+```ini
+myapp.test | ~/Sites/myapp/public | 8.5 | laravel
+```
+
+| Project type | Document root |
+|---|---|
+| Laravel / Symfony | `<project>/public` |
+| WordPress | folder containing `wp-config.php` |
+| Plain PHP / legacy | folder containing `index.php` |
+| Root `.htaccess` forwarding into `public/` | the project root |
+
+Existing projects are pointed the same way — nothing is moved or copied. `kind` only affects the URL rewrite
+done by `devstack ssl enable/disable`.
+
 ## Troubleshooting
 | Symptom | Fix |
 |---|---|

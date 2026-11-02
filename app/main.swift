@@ -183,8 +183,13 @@ struct ModuleRow: View {
     }
 }
 
+final class HelpState: ObservableObject {
+    @Published var show = false
+}
+
 struct ContentView: View {
     @EnvironmentObject var ctl: StackController
+    @StateObject private var help = HelpState()
     private let timer = Timer.publish(every: 4, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -197,6 +202,9 @@ struct ContentView: View {
         }
         .frame(minWidth: 660, minHeight: 600)
         .onReceive(timer) { _ in if !ctl.busy { ctl.loadStatus() } }
+        .sheet(isPresented: $help.show) {
+            HelpView(onClose: { help.show = false })
+        }
     }
 
     private var header: some View {
@@ -214,6 +222,7 @@ struct ContentView: View {
                 Button(action: { ctl.stopAll() })    { Label("Stop All", systemImage: "stop.fill") }.disabled(ctl.busy)
                 Button(action: { ctl.restartAll() }) { Label("Restart All", systemImage: "arrow.clockwise") }.disabled(ctl.busy)
                 Spacer()
+                Button(action: { help.show = true }) { Label("Help", systemImage: "questionmark.circle") }
                 Button(action: { ctl.refreshAll() }) { Label("Refresh", systemImage: "arrow.triangle.2.circlepath") }.disabled(ctl.busy)
             }
         }
@@ -268,6 +277,136 @@ struct ContentView: View {
             }.frame(height: 92)
         }
         .padding(12)
+    }
+}
+
+// MARK: - Help
+
+struct HelpView: View {
+    var onClose: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Label("Dev Stack — Help", systemImage: "questionmark.circle.fill")
+                    .font(.system(size: 15, weight: .semibold))
+                Spacer()
+                Button(action: onClose) { Label("Close", systemImage: "xmark") }
+                    .keyboardShortcut(.cancelAction)
+            }
+            .padding(14)
+            Divider()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    HelpSection(title: "Quick start") {
+                        HelpText("Start or stop everything — or a single module — with the buttons in the main window, or from a terminal:")
+                        HelpCode("devstack status\ndevstack start | stop | restart [module]\ndevstack doctor")
+                    }
+                    HelpSection(title: "Add a new project") {
+                        HelpText("1. Put the project anywhere (e.g. ~/Sites/myapp).")
+                        HelpText("2. Register it — interactively, or add one line to ~/.config/devstack/sites.conf:")
+                        HelpCode("devstack add-site\n\n# host | docroot | php | kind | aliases\nmyapp.test | ~/Sites/myapp/public | 8.5 | laravel")
+                        HelpText("3. Apply and verify:")
+                        HelpCode("devstack sync\ndevstack doctor")
+                    }
+                    HelpSection(title: "Point an existing project here") {
+                        HelpText("Nothing is moved or copied. Add one line pointing at its document root and run devstack sync — that is all. That is exactly how the sites below are configured.")
+                    }
+                    HelpSection(title: "Which folder is the document root?") {
+                        HelpRow("Laravel / Symfony", "<project>/public")
+                        HelpRow("WordPress", "the folder containing wp-config.php")
+                        HelpRow("Plain PHP / legacy", "the folder containing index.php")
+                        HelpRow("Root .htaccess forwarding to public/", "the project root")
+                        HelpText("The “kind” column only controls what SSL toggling rewrites: Laravel APP_URL, WordPress siteurl/home.")
+                    }
+                    HelpSection(title: "Commands") {
+                        HelpRow("devstack status", "every module and its state")
+                        HelpRow("devstack start | stop | restart [module]", "control all modules, or one")
+                        HelpRow("devstack sites", "list configured sites")
+                        HelpRow("devstack add-site", "add a site interactively")
+                        HelpRow("devstack sync", "regenerate vhosts + /etc/hosts, reload")
+                        HelpRow("devstack composer --site HOST", "run Composer with the site's PHP")
+                        HelpRow("devstack ssl enable | disable", "trusted HTTPS for all sites")
+                        HelpRow("devstack doctor", "verify services, configs, sites")
+                    }
+                    HelpSection(title: "Looks broken?") {
+                        HelpRow("502 Bad Gateway", "Apache is down → devstack start apache")
+                        HelpRow("404 on :80 but works on :8081", "stale vhosts → devstack sync")
+                        HelpRow("Site name doesn't resolve", "hosts entry missing → devstack sync")
+                        HelpRow("Wrong PHP version", "fix the php column, then devstack sync")
+                        HelpRow("A module won't start", "the console shows the underlying brew error")
+                    }
+                    HelpSection(title: "Where things live") {
+                        HelpRow("sites", "~/.config/devstack/sites.conf")
+                        HelpRow("settings", "~/.config/devstack/config")
+                        HelpRow("activity log", "~/.local/share/devstack/devstack.log")
+                        HelpRow("config backups", "~/.local/share/devstack/backups/")
+                    }
+                }
+                .padding(20)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .frame(minWidth: 660, minHeight: 620)
+    }
+}
+
+struct HelpSection<Content: View>: View {
+    let title: String
+    let content: Content
+
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).font(.system(size: 14, weight: .semibold))
+            content
+        }
+    }
+}
+
+struct HelpText: View {
+    let text: String
+    init(_ t: String) { text = t }
+    var body: some View {
+        Text(text)
+            .font(.system(size: 12))
+            .foregroundColor(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+struct HelpCode: View {
+    let code: String
+    init(_ c: String) { code = c }
+    var body: some View {
+        Text(code)
+            .font(.system(size: 11, design: .monospaced))
+            .textSelection(.enabled)
+            .padding(8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(nsColor: .textBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+    }
+}
+
+struct HelpRow: View {
+    let key: String
+    let value: String
+    init(_ k: String, _ v: String) { key = k; value = v }
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Text(key)
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .frame(width: 250, alignment: .leading)
+            Text(value)
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
+            Spacer(minLength: 0)
+        }
     }
 }
 

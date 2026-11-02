@@ -3,6 +3,15 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] — 2026-11-02
+
+### Added
+- **In-app Help** — a **Help** button in the app opens a scrollable guide (quick start, adding a site,
+  document-root rules, commands, troubleshooting) with a **Close** button, so the docs are available without
+  opening the README.
+- Documentation: an **“Adding a site”** section in the README and `docs/INSTALL.md` covering new and existing
+  projects and which folder should be the document root.
+
 ## [1.0.2] — 2026-11-02
 
 ### Fixed
@@ -52,3 +61,4 @@ All notable changes to this project are documented here. The format follows
 [1.0.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.0.0
 [1.0.1]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.0.1
 [1.0.2]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.0.2
+[1.1.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.1.0
