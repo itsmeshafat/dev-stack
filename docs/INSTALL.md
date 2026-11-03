@@ -27,7 +27,7 @@ The installer:
    (`/usr/local/sbin/devstack-web` + one `NOPASSWD` sudoers rule) — **one password prompt**.
 8. Builds and installs the **Dev Stack** app.
 
-Flags: `--dry-run` · `--yes` · `--no-brew` · `--ssl` · `--helper-only` · `--app-only` · `--uninstall`.
+Flags: `--dry-run` · `--yes` · `--no-brew` · `--ssl` · `--phpmyadmin` · `--helper-only` · `--app-only` · `--uninstall`.
 
 ## HTTPS
 ```bash
@@ -104,6 +104,12 @@ CREATE DATABASE myapp OWNER myapp;
 
 Creating users and databases, grants, dumps and restores, resetting a forgotten MySQL root password, and every
 common error are covered in [`docs/DATABASES.md`](DATABASES.md).
+
+For a browser UI, phpMyAdmin is available as an opt-in step (PHP 8.3, cookie auth, nothing stored):
+
+```bash
+devstack phpmyadmin install     # or: ./install.sh --phpmyadmin
+```
 
 ## Updates
 

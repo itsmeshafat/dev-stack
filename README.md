@@ -238,7 +238,7 @@ MySQL 8.4 (`:3306`), PostgreSQL 18 (`:5432`) and Redis (`:6379`) run as plain Ho
 **not** create databases, users or passwords for you — and it never backs them up.
 
 ```sql
--- MySQL 8.4 — root has a password (phpMyAdmin stores it in ~/Sites/phpmyadmin/config.inc.php if you added it)
+-- MySQL 8.4 — a fresh Homebrew install has no root password (`mysql -u root`); add -p if you set one
 CREATE DATABASE myapp CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 CREATE USER 'myapp'@'localhost' IDENTIFIED BY 'STRONG-PASSWORD';
 CREATE USER 'myapp'@'127.0.0.1' IDENTIFIED BY 'STRONG-PASSWORD';
@@ -257,6 +257,17 @@ CREATE DATABASE myapp OWNER myapp;
 Creating users and databases, grants, `mysqldump`/`pg_dump` restores, resetting a forgotten MySQL root password
 and every common error are in **[`docs/DATABASES.md`](docs/DATABASES.md)**.
 
+Want a browser UI? It's opt-in:
+
+```bash
+devstack phpmyadmin install     # or: ./install.sh --phpmyadmin
+```
+
+That downloads the current phpMyAdmin, verifies the published SHA-256, installs it in `~/Sites/phpmyadmin` and
+serves it at **https://phpmyadmin.test** (on PHP 8.3 — 5.2.x supports PHP `>=7.2,<8.4`). Authentication is
+`cookie`, so no database password is ever stored, and an existing phpMyAdmin that dev-stack did not install is
+never overwritten.
+
 ## Commands
 
 | Command | What it does |
@@ -267,6 +278,7 @@ and every common error are in **[`docs/DATABASES.md`](docs/DATABASES.md)**.
 | `devstack add-site` | Add a site interactively |
 | `devstack sync` | Regenerate vhosts and reload nginx + Apache |
 | `devstack ssl {enable \| disable \| status \| renew}` | Toggle trusted HTTPS for all sites |
+| `devstack phpmyadmin [status \| install]` | Optional phpMyAdmin at `https://phpmyadmin.test` |
 | `devstack update [--check \| --rollback]` | Check for / apply a release safely |
 | `devstack composer [--site H \| --php V] …` | Run Composer with the site's PHP, from its project root |
 | `devstack doctor` | Verify formulae, services, configs, helper, and every site |

@@ -28,10 +28,11 @@ Open an admin shell:
 mysql -u root -p            # then type the root password
 ```
 
-> **Where's the root password?** It's the one set when MySQL was configured on this machine. If you added the
-> phpMyAdmin site, it stores the password for its `config` auth type in
-> `~/Sites/phpmyadmin/config.inc.php` — `grep password ~/Sites/phpmyadmin/config.inc.php`. Forgotten it?
-> See [Reset the MySQL root password](#reset-the-mysql-root-password).
+> **Is there a root password?** On a fresh Homebrew install there is **none** — `mysql -u root` just works. If
+> MySQL was carried over from an older tool (FlyEnv, Docker, a manual import), root may already have one: add
+> `-p`. Don't know it? See [Reset the MySQL root password](#reset-the-mysql-root-password). If a phpMyAdmin
+> installed with `auth_type = 'config'` is on this machine, it may be storing that password in its
+> `config.inc.php` — `grep password ~/Sites/phpmyadmin/config.inc.php`.
 
 ### Create a database, user and password
 
@@ -86,10 +87,23 @@ mysqldump -u root -p --all-databases > ~/Backups/all.sql   # everything
 mysql -u root -p myapp < ~/Backups/myapp.sql               # restore
 ```
 
-### GUI
+### GUI — phpMyAdmin (optional)
 
-If you registered a **phpMyAdmin** site in `sites.conf`, open **https://phpmyadmin.test** →
-*Databases* to create one, *User accounts* to add a user.
+```bash
+devstack phpmyadmin install     # or: ./install.sh --phpmyadmin
+devstack phpmyadmin status
+```
+
+This downloads the current phpMyAdmin, verifies the published SHA-256, installs it under `~/Sites/phpmyadmin`,
+registers `phpmyadmin.test` on **PHP 8.3** (5.2.x supports PHP `>=7.2,<8.4`) and reloads nginx. Open
+**https://phpmyadmin.test** and log in with a MySQL account.
+
+Authentication is `cookie`, so **no database password is written to disk**. If `~/Sites/phpmyadmin` already holds
+a phpMyAdmin that dev-stack did not install, the command refuses to touch it — re-run with `--force` to have the
+existing one backed up to `~/Sites/phpmyadmin.devstack-backup-<timestamp>` and replaced.
+
+To remove it: delete `~/Sites/phpmyadmin`, remove its line from `~/.config/devstack/sites.conf`, then
+`devstack sync`.
 
 ### Troubleshooting
 

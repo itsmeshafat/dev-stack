@@ -17,6 +17,7 @@ PKG_ROOT="$(cd -P "$(dirname "$SOURCE")/.." && pwd)"
 . "$PKG_ROOT/lib/sites.sh"
 . "$PKG_ROOT/lib/ssl.sh"
 . "$PKG_ROOT/lib/update.sh"
+. "$PKG_ROOT/lib/phpmyadmin.sh"
 
 load_config
 HELPER="${DEVSTACK_HELPER:-/usr/local/sbin/devstack-web}"
@@ -289,6 +290,16 @@ cmd_update() {
   fi
 }
 
+cmd_phpmyadmin() {
+  local sub="${1:-status}" force=0
+  case "$sub" in
+    status)  pma_status ;;
+    install) [ "${2:-}" = "--force" ] && force=1; pma_install "$force" ;;
+    -h|--help) note "usage: devstack phpmyadmin [status|install [--force]]" ;;
+    *) die "usage: devstack phpmyadmin [status|install [--force]]" ;;
+  esac
+}
+
 usage() {
   cat <<EOF
 devstack $DEVSTACK_VERSION — local dev stack control
@@ -306,6 +317,7 @@ Commands:
   sync                   regenerate vhosts + reload nginx/apache
   composer [opts] ...    run Composer with the site's PHP (--site HOST | --php VER)
   ssl {enable|disable|status|renew}   trusted HTTPS for all sites
+  phpmyadmin [status|install]   optional phpMyAdmin at https://phpmyadmin.test
   update [--check]       check for a new release (--check --json for the app)
   update --rollback      restore the previous version
   doctor                 verify services, configs, ports, helper, sites
@@ -328,6 +340,7 @@ case "$cmd" in
   sync)     cmd_sync ;;
   composer) shift; cmd_composer "$@" ;;
   ssl)      shift; cmd_ssl "$@" ;;
+  phpmyadmin) shift; cmd_phpmyadmin "$@" ;;
   update)   shift; cmd_update "$@" ;;
   doctor)  cmd_doctor ;;
   version|-v|--version) echo "devstack $DEVSTACK_VERSION" ;;

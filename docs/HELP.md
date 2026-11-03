@@ -45,8 +45,7 @@ MySQL 8.4 (:3306), PostgreSQL 18 (:5432) and Redis (:6379) run as Homebrew servi
 databases, users or passwords for you — and it never backs up your data. Full guide: docs/DATABASES.md.
 
 ### MySQL
-The root account has a password. If you added the phpMyAdmin site, it stores that password in
-~/Sites/phpmyadmin/config.inc.php.
+A fresh Homebrew install has no root password, so mysql -u root just works; add -p if one was set.
 
 ```
 mysql -u root -p
@@ -61,7 +60,15 @@ GRANT ALL PRIVILEGES ON myapp.* TO 'myapp'@'127.0.0.1';
 FLUSH PRIVILEGES;
 ```
 
-localhost (socket) and 127.0.0.1 (TCP) count as different accounts, so create both. GUI: https://phpmyadmin.test
+localhost (socket) and 127.0.0.1 (TCP) count as different accounts, so create both.
+
+Prefer a GUI? phpMyAdmin is opt-in — install it, then log in with a MySQL account.
+
+```
+devstack phpmyadmin install
+```
+
+https://phpmyadmin.test — installed on PHP 8.3, cookie auth, so no password is stored.
 
 ### PostgreSQL
 Your macOS username is a superuser and local connections are trusted, so no password is needed here.

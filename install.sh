@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # dev-stack installer — safe, idempotent, dry-run capable.
 #
-#   ./install.sh [--dry-run] [--yes] [--no-brew] [--helper-only] [--app-only] [--uninstall]
+#   ./install.sh [--dry-run] [--yes] [--no-brew] [--ssl] [--phpmyadmin]
+#                 [--helper-only] [--app-only] [--uninstall]
 #
 # What it does:
 #   preflight -> backup -> brew formulae -> php-fpm sockets -> vhosts
@@ -19,6 +20,7 @@ PKG_ROOT="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 . "$PKG_ROOT/lib/sites.sh"
 . "$PKG_ROOT/lib/ssl.sh"
 . "$PKG_ROOT/lib/hosts.sh"
+. "$PKG_ROOT/lib/phpmyadmin.sh"
 
 # respect the user's existing settings (ports, SSL) so a reinstall never downgrades config
 load_config
@@ -28,13 +30,14 @@ CLI_LINK="$HOME/.local/bin/devstack"
 HELPER_DST="/usr/local/sbin/devstack-web"
 SUDOERS_DST="/etc/sudoers.d/devstack"
 
-DO_BREW=1; DO_APP=1; DO_MAIN=1; DO_HELPER=1; DO_SSL=0; ASSUME_YES=0
+DO_BREW=1; DO_APP=1; DO_MAIN=1; DO_HELPER=1; DO_SSL=0; DO_PMA=0; ASSUME_YES=0
 for a in "$@"; do case "$a" in
   --dry-run)     DRY_RUN=1 ;;
   --yes|-y)      ASSUME_YES=1 ;;
   --no-brew)     DO_BREW=0 ;;
   --no-helper)   DO_HELPER=0 ;;
   --ssl)         DO_SSL=1 ;;
+  --phpmyadmin)  DO_PMA=1 ;;
   --helper-only) DO_MAIN=0; DO_BREW=0; DO_APP=0 ;;
   --app-only)    DO_MAIN=0; DO_BREW=0; DO_HELPER=0 ;;
   --uninstall)   exec "$PKG_ROOT/uninstall.sh" "${@:2}" ;;
@@ -272,4 +275,5 @@ fi
 [ "$DO_HELPER" = 1 ] && install_helper
 if [ "$DO_MAIN" = 1 ]; then install_cli; fi
 [ "$DO_APP" = 1 ] && build_app
+[ "$DO_PMA" = 1 ] && pma_install 0
 summary

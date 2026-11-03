@@ -3,6 +3,20 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.0] — 2026-11-03
+
+### Added
+- **Optional phpMyAdmin** — `devstack phpmyadmin install` (or `./install.sh --phpmyadmin`) downloads the current
+  phpMyAdmin, **verifies the published SHA-256**, installs it under `~/Sites/phpmyadmin`, writes a
+  `config.inc.php` using **cookie auth** (no password stored) and registers `phpmyadmin.test` on **PHP 8.3**
+  (5.2.x supports PHP `>=7.2,<8.4`). `devstack phpmyadmin status` reports what's installed.
+- An existing phpMyAdmin that dev-stack did not install is **never overwritten**: the command refuses and says so,
+  or `--force` moves it to `<dir>.devstack-backup-<timestamp>` first.
+
+### Fixed
+- Docs no longer imply every machine has a MySQL root password, nor that a phpMyAdmin already exists — a fresh
+  Homebrew MySQL has **no** root password, and phpMyAdmin is now a real opt-in install.
+
 ## [1.4.0] — 2026-11-03
 
 ### Added
@@ -140,3 +154,4 @@ All notable changes to this project are documented here. The format follows
 [1.3.4]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.4
 [1.3.5]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.5
 [1.4.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.4.0
+[1.5.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.5.0
