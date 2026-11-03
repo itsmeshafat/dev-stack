@@ -80,6 +80,31 @@ myapp.test | ~/Sites/myapp/public | 8.5 | laravel
 Existing projects are pointed the same way — nothing is moved or copied. `kind` only affects the URL rewrite
 done by `devstack ssl enable/disable`.
 
+## Databases
+
+The data engines are plain Homebrew services. dev-stack does **not** create databases, users or passwords for
+you, and it never backs them up.
+
+```bash
+mysql -u root -p     # MySQL 8.4 · 127.0.0.1:3306  (root has a password)
+psql postgres        # PostgreSQL 18 · 127.0.0.1:5432  (your macOS user is superuser)
+redis-cli            # Redis · 127.0.0.1:6379  (no auth by default)
+```
+
+```sql
+-- MySQL
+CREATE DATABASE myapp CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE USER 'myapp'@'127.0.0.1' IDENTIFIED BY 'STRONG-PASSWORD';
+GRANT ALL PRIVILEGES ON myapp.* TO 'myapp'@'127.0.0.1';
+
+-- PostgreSQL
+CREATE ROLE myapp LOGIN PASSWORD 'STRONG-PASSWORD';
+CREATE DATABASE myapp OWNER myapp;
+```
+
+Creating users and databases, grants, dumps and restores, resetting a forgotten MySQL root password, and every
+common error are covered in [`docs/DATABASES.md`](DATABASES.md).
+
 ## Updates
 
 ```bash

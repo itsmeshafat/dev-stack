@@ -40,6 +40,59 @@ Nothing is moved or copied. Add one line pointing at its document root and run d
 
 The "kind" column only controls what SSL toggling rewrites: Laravel APP_URL, WordPress siteurl/home.
 
+## Databases
+MySQL 8.4 (:3306), PostgreSQL 18 (:5432) and Redis (:6379) run as Homebrew services. dev-stack does not create
+databases, users or passwords for you — and it never backs up your data. Full guide: docs/DATABASES.md.
+
+### MySQL
+The root account has a password. If you added the phpMyAdmin site, it stores that password in
+~/Sites/phpmyadmin/config.inc.php.
+
+```
+mysql -u root -p
+```
+
+```
+CREATE DATABASE myapp CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE USER 'myapp'@'localhost' IDENTIFIED BY 'STRONG-PASSWORD';
+CREATE USER 'myapp'@'127.0.0.1' IDENTIFIED BY 'STRONG-PASSWORD';
+GRANT ALL PRIVILEGES ON myapp.* TO 'myapp'@'localhost';
+GRANT ALL PRIVILEGES ON myapp.* TO 'myapp'@'127.0.0.1';
+FLUSH PRIVILEGES;
+```
+
+localhost (socket) and 127.0.0.1 (TCP) count as different accounts, so create both. GUI: https://phpmyadmin.test
+
+### PostgreSQL
+Your macOS username is a superuser and local connections are trusted, so no password is needed here.
+
+```
+psql postgres
+```
+
+```
+CREATE ROLE myapp LOGIN PASSWORD 'STRONG-PASSWORD';
+CREATE DATABASE myapp OWNER myapp;
+```
+
+Shorter: createuser -P myapp    then    createdb -O myapp myapp
+
+### Redis
+No users or passwords by default, and "databases" are numbered keyspaces 0–15.
+
+```
+redis-cli -n 1        # keyspace 1
+redis-cli FLUSHDB     # wipe the current keyspace (destructive)
+```
+
+### Back up before you migrate
+dev-stack never backs up databases, so dump them yourself first.
+
+```
+mysqldump -u root -p --all-databases > ~/Backups/mysql-$(date +%F).sql
+pg_dumpall > ~/Backups/postgres-$(date +%F).sql
+```
+
 ## Updates
 The app checks for a newer release at launch and shows an Update banner (Update now · Release notes ·
 Dismiss). You can also check manually from the app menu (⌘U).

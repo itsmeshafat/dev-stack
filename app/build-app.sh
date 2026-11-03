@@ -46,8 +46,8 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
   <key>CFBundleName</key><string>Dev Stack</string>
   <key>CFBundleDisplayName</key><string>Dev Stack</string>
   <key>CFBundleIdentifier</key><string>io.github.devstack.app</string>
-  <key>CFBundleVersion</key><string>1.3.5</string>
-  <key>CFBundleShortVersionString</key><string>1.3.5</string>
+  <key>CFBundleVersion</key><string>1.4.0</string>
+  <key>CFBundleShortVersionString</key><string>1.4.0</string>
   <key>CFBundleExecutable</key><string>DevStack</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>

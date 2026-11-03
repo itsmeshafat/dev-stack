@@ -2,7 +2,7 @@
 # lib/common.sh — environment detection, config, logging, dry-run helpers.
 # Sourced by bin/devstack, bin/devstack-web and install.sh. Not executed directly.
 
-DEVSTACK_VERSION="1.3.5"
+DEVSTACK_VERSION="1.4.0"
 
 # ---- resolvable paths (all HOME/brew-prefix relative, no machine hardcoding) ----
 DEVSTACK_HOME="${DEVSTACK_HOME:-$HOME/.local/share/devstack}"

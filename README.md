@@ -23,6 +23,7 @@
   <a href="#why-dev-stack">Why</a> &nbsp;·&nbsp;
   <a href="#how-it-works">How it works</a> &nbsp;·&nbsp;
   <a href="#configuration">Configuration</a> &nbsp;·&nbsp;
+  <a href="#databases">Databases</a> &nbsp;·&nbsp;
   <a href="#commands">Commands</a> &nbsp;·&nbsp;
   <a href="#safety">Safety</a> &nbsp;·&nbsp;
   <a href="docs/INSTALL.md">Docs</a> &nbsp;·&nbsp;
@@ -231,6 +232,31 @@ Pointing an **existing** project at the stack is that same single line — the `
 > [`docs/HELP.md`](docs/HELP.md) in a window. The guide is bundled at build time, so app and docs stay in sync
 > from one file.
 
+## Databases
+
+MySQL 8.4 (`:3306`), PostgreSQL 18 (`:5432`) and Redis (`:6379`) run as plain Homebrew services. dev-stack does
+**not** create databases, users or passwords for you — and it never backs them up.
+
+```sql
+-- MySQL 8.4 — root has a password (phpMyAdmin stores it in ~/Sites/phpmyadmin/config.inc.php if you added it)
+CREATE DATABASE myapp CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE USER 'myapp'@'localhost' IDENTIFIED BY 'STRONG-PASSWORD';
+CREATE USER 'myapp'@'127.0.0.1' IDENTIFIED BY 'STRONG-PASSWORD';
+GRANT ALL PRIVILEGES ON myapp.* TO 'myapp'@'localhost';
+GRANT ALL PRIVILEGES ON myapp.* TO 'myapp'@'127.0.0.1';
+
+-- PostgreSQL 18 — your macOS user is a superuser, and local connections are trusted
+CREATE ROLE myapp LOGIN PASSWORD 'STRONG-PASSWORD';
+CREATE DATABASE myapp OWNER myapp;
+```
+
+> **`localhost` and `127.0.0.1` are different accounts** to MySQL — `localhost` uses the socket, `127.0.0.1`
+> uses TCP. Laravel connects over TCP while the `mysql` CLI usually uses the socket, so create both if you're
+> unsure. Redis has no users and its "databases" are numbered keyspaces (`redis-cli -n 1`).
+
+Creating users and databases, grants, `mysqldump`/`pg_dump` restores, resetting a forgotten MySQL root password
+and every common error are in **[`docs/DATABASES.md`](docs/DATABASES.md)**.
+
 ## Commands
 
 | Command | What it does |
@@ -297,6 +323,7 @@ More in [`docs/INSTALL.md`](docs/INSTALL.md).
 | Document | Contents |
 |---|---|
 | [`docs/INSTALL.md`](docs/INSTALL.md) | Install, flags, troubleshooting |
+| [`docs/DATABASES.md`](docs/DATABASES.md) | Creating databases, users and passwords; dumps, restores, troubleshooting |
 | [`docs/HELP.md`](docs/HELP.md) | The in-app guide (also in the app via **Help** / <kbd>⌘</kbd><kbd>?</kbd>) |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | How the pieces fit together |
 | [`docs/SAFETY.md`](docs/SAFETY.md) | Exactly what it touches on your machine |

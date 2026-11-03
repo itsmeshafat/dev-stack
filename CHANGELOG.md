@@ -3,6 +3,16 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] — 2026-11-03
+
+### Added
+- **Database documentation** — a new [`docs/DATABASES.md`](docs/DATABASES.md) covers creating databases, users
+  and passwords on MySQL 8.4 and PostgreSQL 18, grants, `mysqldump`/`pg_dump` backups and restores, dropping
+  and resetting a forgotten MySQL root password, plus a troubleshooting table per engine and a cheat sheet.
+- **In-app Help chapter** — the same material, condensed, now ships inside the app (**Help** / ⌘?), alongside
+  the existing guide.
+- **README + `docs/INSTALL.md` sections** for databases, linking to the full guide.
+
 ## [1.3.5] — 2026-11-02
 
 ### Changed
@@ -129,3 +139,4 @@ All notable changes to this project are documented here. The format follows
 [1.3.3]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.3
 [1.3.4]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.4
 [1.3.5]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.5
+[1.4.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.4.0
