@@ -83,7 +83,7 @@ func draw(_ t: String, _ x: CGFloat, _ y: CGFloat, _ size: CGFloat, _ weight: NS
 }
 
 draw("dev-stack", 384, 132, 116, .bold, 1.0)
-draw("Local dev stack for macOS", 390, 274, 40, .medium, 0.90)
+draw("Local dev stack for macOS & Windows", 388, 274, 40, .medium, 0.90)
 draw("nginx · Apache · MySQL · PostgreSQL · Redis · Mailpit · PHP 8.5/8.3/7.4", 392, 64, 26, .medium, 0.72)
 
 img.unlockFocus()
