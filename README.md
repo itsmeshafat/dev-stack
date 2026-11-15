@@ -1,212 +1,291 @@
-<p align="center">
-  <img src="docs/banner.jpg" alt="dev-stack — a complete local dev stack for macOS and Windows" width="100%">
-</p>
+<div align="center">
 
-<p align="center">
-  <sub><b>nginx · Apache · PHP · MySQL · PostgreSQL · Redis · Mailpit</b> on macOS <i>and</i> Windows —<br>
-  clean <code>*.test</code> URLs, real <code>.htaccess</code>, trusted HTTPS and a native control app.</sub>
-</p>
+<img src="docs/banner.jpg" alt="dev-stack — a complete local dev stack for macOS and Windows" width="100%">
 
-<p align="center">
-  <a href="#install"><img alt="macOS 12+" src="https://img.shields.io/badge/macOS-12%2B-black?logo=apple&logoColor=white"></a>
-  <img alt="Windows 10/11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows&logoColor=white">
-  <a href="https://brew.sh"><img alt="Homebrew" src="https://img.shields.io/badge/Homebrew-powered-fbb040?logo=homebrew&logoColor=white"></a>
-  <a href="https://scoop.sh"><img alt="Scoop" src="https://img.shields.io/badge/Scoop-powered-6E56CF"></a>
-  <a href="https://github.com/itsmeshafat/dev-stack/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/itsmeshafat/dev-stack?sort=semver&color=6E56CF&label=release"></a>
-  <a href="https://github.com/itsmeshafat/dev-stack/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/itsmeshafat/dev-stack/actions/workflows/ci.yml/badge.svg"></a>
-  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3DA639"></a>
-</p>
+# dev-stack
 
-<p align="center">
-  <a href="#install"><b>Install</b></a> &nbsp;·&nbsp;
-  <a href="#platforms">Platforms</a> &nbsp;·&nbsp;
-  <a href="#how-it-works">How it works</a> &nbsp;·&nbsp;
-  <a href="#configuration">Configuration</a> &nbsp;·&nbsp;
-  <a href="#migrating-an-existing-setup">Migrate</a> &nbsp;·&nbsp;
-  <a href="#commands">Commands</a> &nbsp;·&nbsp;
-  <a href="#safety">Safety</a> &nbsp;·&nbsp;
-  <a href="CHANGELOG.md">Changelog</a>
-</p>
+**A complete local web-development stack on macOS *and* Windows — one command.**
 
-<p align="center">
-  <sub><b>9 services</b> &nbsp;·&nbsp; <b>3 PHP versions</b> &nbsp;·&nbsp; <b>1 command</b> &nbsp;·&nbsp; <b>0 DNS daemons</b> &nbsp;·&nbsp; <b>0 containers</b></sub>
-</p>
+<sub>nginx · Apache · PHP 8.5 / 8.3 / 7.4 · MySQL · PostgreSQL · Redis · Mailpit</sub><br>
+<sub>clean <code>*.test</code> URLs · real <code>.htaccess</code> · trusted HTTPS · a native control app</sub>
+
+<br>
+
+[![macOS 12+](https://img.shields.io/badge/macOS-12%2B-black?logo=apple&logoColor=white)](#install)
+[![Windows 10/11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows&logoColor=white)](#install)
+[![Release](https://img.shields.io/github/v/release/itsmeshafat/dev-stack?sort=semver&color=6E56CF&label=release)](https://github.com/itsmeshafat/dev-stack/releases)
+[![CI](https://github.com/itsmeshafat/dev-stack/actions/workflows/ci.yml/badge.svg)](https://github.com/itsmeshafat/dev-stack/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/itsmeshafat/dev-stack?color=6E56CF)](https://github.com/itsmeshafat/dev-stack/stargazers)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-6E56CF)](https://github.com/itsmeshafat/dev-stack/pulls)
+
+[**Install**](#install) · [Platforms](#platforms) · [How it works](#how-it-works) · [Migrate](#migrating-an-existing-setup) · [Commands](#commands) · [Docs](#documentation) · [Safety](#safety)
+
+<sub><b>9 services</b> · <b>3 PHP versions</b> · <b>1 command</b> · <b>0 DNS daemons</b> · <b>0 containers</b></sub>
+
+</div>
 
 ---
 
-## Platforms
+> **No containers, no VMs, no DNS daemon.** dev-stack wires plain Homebrew (macOS) or Scoop (Windows)
+> services together on your real filesystem: nginx in front of Apache for genuine `.htaccess` support,
+> php-fpm/php-cgi behind it, per-site PHP versions, clean `*.test` URLs, trusted TLS, and a native app to
+> start/stop everything.
 
-dev-stack is one tool with two first-class implementations and per-platform releases. The command surface
-and `sites.conf` format are the same on both, so a configuration moves between machines.
+<div align="center">
+<table>
+<tr>
+<td width="50%"><img src="docs/app.jpg" alt="dev-stack on macOS"><br><sub><b>macOS</b> — SwiftUI app</sub></td>
+<td width="50%"><img src="docs/windows-app.png" alt="dev-stack on Windows"><br><sub><b>Windows</b> — tray app, Start Menu & uninstaller</sub></td>
+</tr>
+</table>
+</div>
 
-| | **macOS** | **Windows 10/11 (x64)** |
-|---|---|---|
-| Entry point | `./install.sh` + `bin/devstack` (bash) | `windows\install.ps1` + `devstack` (PowerShell) |
-| Web topology | nginx :80/:443 → Apache :8081 → **PHP-FPM** unix sockets | nginx :80/:443 → Apache :8081 → **php-cgi** (FastCGI, `mod_fcgid`) |
-| Packages | Homebrew | Scoop (Apache Lounge fallback) |
-| Control app | SwiftUI (macOS) | Windows Forms — Start Menu, Apps & features, **system tray** |
-| DNS | managed `/etc/hosts` block | managed hosts block via a scoped scheduled task |
-| HTTPS | mkcert wildcard `*.test` | mkcert wildcard `*.test` |
+## At a glance
 
-<p align="center">
-  <img src="docs/app.jpg" alt="The Dev Stack app on macOS" width="410">
-  <img src="docs/windows-app.png" alt="The Dev Stack app on Windows" width="410">
-  <br>
-  <sub><b>macOS</b> (SwiftUI) &nbsp;·&nbsp; <b>Windows</b> (with tray, Start Menu and uninstaller)</sub>
-</p>
+| | |
+|---|---|
+| **Platforms** | macOS 12+ (Apple Silicon & Intel) · Windows 10/11 (x64) |
+| **Web stack** | nginx `:80`/`:443` → Apache `127.0.0.1:8081` → PHP |
+| **PHP** | 8.5, 8.3 and 7.4 side by side — chosen per site |
+| **Data** | MySQL 8.4 · PostgreSQL 18 · Redis · Mailpit (SMTP + UI) |
+| **URLs** | `yourapp.test` on one port, generated from one `sites.conf` |
+| **TLS** | mkcert wildcard `*.test`, `http://` → `https://` |
+| **DNS** | one managed hosts block — no dnsmasq, nothing on port 53 |
+| **Control app** | SwiftUI (macOS) · WinForms + system tray (Windows) |
+| **Updates** | verified, atomic, rollback — never touches your data |
+| **License** | MIT |
 
 ## Why dev-stack
 
-|  |  |
+| | |
 |---|---|
 | 🌐 **Clean URLs on one port** | Every site answers at `yourapp.test` on `:80` — no `:8000`, no `localhost/path`. |
-| 🧩 **Real Apache underneath** | nginx fronts Apache on loopback, so `.htaccess` and `mod_rewrite` behave exactly as in production. |
-| 🐘 **Three PHP versions, side by side** | 8.5, 8.3 and 7.4 — each site picks its own. |
-| 🚫 **No DNS daemon** | `*.test` names live in one managed hosts block, regenerated from your vhosts. |
-| 🖥️ **Native control app** | Start/stop/restart with live status. On Windows it lives in the **notification area**. |
-| 🔒 **Trusted HTTPS** | One wildcard `*.test` certificate via mkcert; `http://` 301s to `https://`. |
-| 🛟 **Safe by design** | `--dry-run`/`-DryRun`, automatic config backups, idempotent installer, clean uninstaller. |
-| 📦 **Migration & data safety** | Import sites from XAMPP/WAMP/Laragon/Herd; reinstall/uninstall keeps config and databases. |
+| 🧩 **Real Apache underneath** | nginx proxies to loopback Apache, so `.htaccess` and `mod_rewrite` behave exactly as in production. |
+| 🐘 **Three PHP versions, side by side** | 8.5, 8.3 and 7.4 — each site picks its own, and `devstack composer` uses it too. |
+| 🚫 **No DNS daemon** | `*.test` names live in one generated hosts block. No dnsmasq, no port 53, survives reboots. |
+| 🖥️ **Native control app** | Start/stop/restart with live status. On Windows it lives in the notification area. |
+| 🔒 **Trusted HTTPS** | One wildcard `*.test` certificate via mkcert; Laravel `APP_URL` / WordPress `siteurl` sync automatically. |
+| 🛟 **Safe by design** | `--dry-run`/`-DryRun`, backups before changes, idempotent install, clean uninstall. |
+| 📦 **Data never lost** | Reinstall/uninstall keep `sites.conf`, settings and databases; `-Purge` only when you ask. |
+| 🔀 **Bring existing work** | Import sites from XAMPP/WAMP/Laragon/Herd and import `mysqldump`/`pg_dump` files. |
 
 ## Install
 
+<table>
+<tr><td width="50%" valign="top">
+
 **macOS**
+
 ```bash
 git clone https://github.com/itsmeshafat/dev-stack.git
 cd dev-stack
-./install.sh --dry-run     # prints every action, changes nothing
-./install.sh
+
+./install.sh --dry-run   # print every action, change nothing
+./install.sh             # install (one admin prompt)
 ```
 
+</td><td width="50%" valign="top">
+
 **Windows** (PowerShell)
+
 ```powershell
 git clone https://github.com/itsmeshafat/dev-stack.git
 cd dev-stack
+
 powershell -File windows\install.ps1 -DryRun
 powershell -File windows\install.ps1
 ```
 
-Then add a site with one line (`~/Sites/myapp` / `C:\Sites\myapp`) and apply:
-```bash
-devstack add-site     # or edit ~/.config/devstack/sites.conf / %USERPROFILE%\.config\devstack\sites.conf
-devstack sync
-devstack doctor
+</td></tr>
+</table>
+
+Then point the stack at a project with one line:
+
+```ini
+# ~/.config/devstack/sites.conf   (or %USERPROFILE%\.config\devstack\sites.conf)
+myapp.test | ~/Sites/myapp/public | 8.5 | laravel
 ```
-Releases are published per platform on the [releases page](https://github.com/itsmeshafat/dev-stack/releases);
-the Windows asset includes the compiled `DevStack.exe`.
+
+```bash
+devstack add-site     # or edit the file above
+devstack sync         # regenerate vhosts + hosts, reload
+devstack doctor       # verify services, configs, sites
+devstack start        # bring the stack up
+```
+
+Prebuilt releases (including the compiled Windows `DevStack.exe`) are on the
+[releases page](https://github.com/itsmeshafat/dev-stack/releases).
+
+## Platforms
+
+One tool, two first-class implementations. The `devstack` command surface and `sites.conf` format are
+identical on both, so a configuration moves between machines.
+
+| | **macOS** | **Windows 10/11 (x64)** |
+|---|---|---|
+| Entry point | `install.sh` + `bin/devstack` (bash) | `windows\install.ps1` + `devstack` (PowerShell) |
+| Package manager | Homebrew | Scoop (automatic Apache Lounge fallback) |
+| PHP | **php-fpm** over unix sockets | **php-cgi** FastCGI via `mod_fcgid` |
+| Privileges | one scoped `NOPASSWD` helper (nginx + hosts) | one scheduled task (hosts only) |
+| App | SwiftUI (`.app`) | WinForms `.exe` + tray, Start Menu, uninstaller |
+| Updates | verified swap + rollback | out-of-process swap + rollback |
 
 ## How it works
 
 ```text
-browser → nginx :80/:443 → Apache 127.0.0.1:8081 → PHP
-                                                   macOS:   php-fpm  /tmp/devstack-php-8x.sock
-                                                   Windows: php-cgi  127.0.0.1:9085/9083/9074 (mod_fcgid)
-data: mysql :3306 · postgres :5432 · redis :6379 · mailpit :1025/:8025
-DNS:  127.0.0.1 <host> in the managed hosts block (generated from nginx server_name)
+                      ┌──────────── yourapp.test :80 / :443 ────────────┐
+   browser ──────────▶│ nginx                                           │
+                      │   servers/<host>.conf → proxy_pass 127.0.0.1:8081
+                      └───────────────────────┬─────────────────────────┘
+                                              ▼
+                      ┌──────── Apache 127.0.0.1:8081 ──────────────────┐
+                      │   AllowOverride All  → .htaccess / mod_rewrite   │
+                      │   macOS:   proxy:unix:/tmp/devstack-php-8x.sock  │
+                      │   Windows: fcgid → 127.0.0.1:9085 / 9083 / 9074  │
+                      └───────────────────────┬─────────────────────────┘
+                                              ▼
+                      PHP-FPM (macOS)  ·  php-cgi (Windows)
+
+   data:  mysql :3306 · postgres :5432 · redis :6379 · mailpit :1025 / :8025
+   DNS:   127.0.0.1 <host> in one managed hosts block (from nginx server_name)
 ```
 
-nginx is the **single public entry point**; Apache binds to **loopback only**. Full details:
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`windows/docs/ARCHITECTURE.md`](windows/docs/ARCHITECTURE.md).
-
-## Configuration
-
-`sites.conf` — one site per line, `|` separated (`kind` and `aliases` optional):
-```ini
-# host | docroot | php | kind | aliases
-myapp.test | ~/Sites/myapp/public        | 8.5 | laravel
-wptest.test | ~/Sites/wptest             | 8.5 | wp
-legacy.test | ~/Sites/legacy             | 7.4 | php
-```
-Paths: macOS `~/.config/devstack/` · Windows `%USERPROFILE%\.config\devstack\`. Data, logs, backups and
-certs live under `~/.local/share/devstack/` and `%LOCALAPPDATA%\devstack\`.
+nginx is the **single public entry point**. Apache binds to **loopback only**, so nothing is exposed
+beyond your machine. Full details: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) ·
+[`windows/docs/ARCHITECTURE.md`](windows/docs/ARCHITECTURE.md).
 
 ## Migrating an existing setup
 
 ```bash
 devstack migrate                  # read-only scan of XAMPP / WAMP / Laragon / Herd
-devstack migrate --apply          # add the sites it finds (nothing is moved)
+devstack migrate --apply          # add the sites it finds (nothing is moved or copied)
 devstack sync
 ```
-Databases move separately (stop the old server first — both use the same ports):
+
+Databases move separately — stop the old server first (both stacks use the same ports):
+
 ```bash
 mysqldump -u root --all-databases > backup.sql
-devstack migrate db backup.sql                       # into MySQL
-devstack migrate db backup.sql --engine pgsql        # into PostgreSQL
+devstack migrate db backup.sql                    # into dev-stack MySQL
+
+pg_dumpall -U postgres > backup.sql
+devstack migrate db backup.sql --engine pgsql     # into dev-stack PostgreSQL
 ```
 
 ## PHP versions
 
-- **Per site:** set the `php` column and run `devstack sync`.
-- **Command line:** `devstack php default 8.3` makes `php`/Composer default to 8.3 (open a new terminal).
-  `devstack php status` shows the current choice.
+- **Per site** — set the `php` column and apply:
+  ```ini
+  myapp.test | ~/Sites/myapp/public | 8.3 | laravel
+  ```
+  ```bash
+  devstack sync
+  ```
+- **Command line** — choose what `php` and Composer use:
+  ```bash
+  devstack php status
+  devstack php default 8.3     # or 7.4 / 8.5
+  ```
+  Open a new terminal afterwards. `devstack composer` always uses the site's declared PHP.
 
 ## Commands
 
-Both platforms expose the same `devstack` commands (macOS bash / Windows PowerShell):
+The same commands exist on both platforms (`devstack` in bash or PowerShell):
 
 | Command | What it does |
 |---|---|
 | `devstack status` | every module and its state |
 | `devstack start \| stop \| restart [module]` | control all modules, or one |
 | `devstack sites` / `add-site` | list / add sites |
-| `devstack sync` | regenerate vhosts + hosts, reload |
-| `devstack ssl {enable\|disable\|status\|renew}` | trusted HTTPS |
+| `devstack sync` | regenerate vhosts + hosts, reload servers |
+| `devstack ssl {enable\|disable\|status\|renew}` | trusted HTTPS for all sites |
 | `devstack php [status\|list\|default V]` | default PHP for the CLI |
-| `devstack migrate [--apply]` / `migrate db FILE` | import a setup / a database dump |
-| `devstack phpmyadmin [status\|install]` | optional phpMyAdmin |
-| `devstack composer [--site H \| --php V] ...` | run Composer with a site's PHP |
+| `devstack migrate [--apply]` | import sites from XAMPP/WAMP/Laragon/Herd |
+| `devstack migrate db FILE` | import a `mysqldump` / `pg_dump` |
+| `devstack phpmyadmin [status\|install]` | optional phpMyAdmin at `https://phpmyadmin.test` |
+| `devstack composer [--site H \| --php V] …` | run Composer with a site's PHP |
 | `devstack update [--check\|--rollback]` | check for / apply a release |
-| `devstack doctor` | verify services, configs, hosts, sites |
+| `devstack doctor` | verify services, configs, hosts, every site |
 
-## Updates
+<details>
+<summary><b>Configuration &amp; file locations</b></summary>
 
-The app checks for a new release at launch. `devstack update` swaps only the application code and the app
-bundle (out-of-process on Windows), keeps the previous versions for `--rollback`, and **never** touches
-config, certificates, hosts, databases or running services.
+<br>
+
+- **Sites** — `~/.config/devstack/sites.conf` · `%USERPROFILE%\.config\devstack\sites.conf`
+  (`host | docroot | php | kind | aliases`)
+- **Settings** — `~/.config/devstack/config` · `%USERPROFILE%\.config\devstack\config`
+- **Data / logs / backups / certs** — `~/.local/share/devstack/` · `%LOCALAPPDATA%\devstack\`
+- **Ports** — override `NGINX_PORT`, `APACHE_PORT`, `SSL_PORT` in `config`
+
+</details>
+
+<details>
+<summary><b>Updates &amp; data safety</b></summary>
+
+<br>
+
+`devstack update` checks the latest release, verifies the archive version, and swaps only the
+application (out-of-process on Windows) while keeping the previous versions for `--rollback`. It never
+touches `sites.conf`, settings, certificates, hosts, vhosts, databases or running services.
+
+Reinstalling and uninstalling **keep** your sites, settings and database data. On Windows, add `-Purge`
+to delete config and databases too. Like macOS, dev-stack never backs up your databases — keep your own
+`mysqldump` / `pg_dump` dumps.
+
+</details>
 
 ## Safety
 
 - `--dry-run` / `-DryRun` prints every action and changes nothing.
-- Configs are backed up before any change; reinstall and uninstall **keep** your `sites.conf`, settings and
-  databases (Windows: add `-Purge` to delete them).
-- The only privileged surface is nginx + the hosts block (macOS: one `NOPASSWD` helper; Windows: one
-  scheduled task). Apache binds to loopback only.
-- **No warranty; back up your data** — dev-stack does not back up databases or project files.
+- Configs are backed up before any change; the hosts file gets a safety copy before each edit.
+- The only privileged surface is nginx + the hosts block (macOS: one scoped helper; Windows: one scheduled
+  task). Apache binds to loopback only.
+- Clean removal restores what it changed and stops every service.
+- **Provided as-is, without warranty.** It does **not** back up databases or project files.
 
-Details: [`docs/SAFETY.md`](docs/SAFETY.md) · [`windows/docs/SAFETY.md`](windows/docs/SAFETY.md) ·
+Read more: [`docs/SAFETY.md`](docs/SAFETY.md) · [`windows/docs/SAFETY.md`](windows/docs/SAFETY.md) ·
 [`SECURITY.md`](SECURITY.md) · [`windows/docs/SECURITY.md`](windows/docs/SECURITY.md).
 
-## Docs
+## Documentation
 
 | Document | Contents |
 |---|---|
 | [`docs/INSTALL.md`](docs/INSTALL.md) | macOS install, flags, troubleshooting |
 | [`windows/docs/INSTALL.md`](windows/docs/INSTALL.md) | Windows install, Scoop/Chocolatey, troubleshooting |
 | [`docs/DATABASES.md`](docs/DATABASES.md) · [`windows/docs/DATABASES.md`](windows/docs/DATABASES.md) | database cookbook per platform |
-| [`docs/HELP.md`](docs/HELP.md) · [`windows/docs/HELP.md`](windows/docs/HELP.md) | in-app guides |
+| [`docs/HELP.md`](docs/HELP.md) · [`windows/docs/HELP.md`](windows/docs/HELP.md) | in-app help guides |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`windows/docs/ARCHITECTURE.md`](windows/docs/ARCHITECTURE.md) | how the pieces fit together |
-| [`docs/SAFETY.md`](docs/SAFETY.md) · [`windows/docs/SAFETY.md`](windows/docs/SAFETY.md) | what it touches |
-| [`SECURITY.md`](SECURITY.md) | privileged surface, threat model, reporting |
+| [`docs/SAFETY.md`](docs/SAFETY.md) · [`windows/docs/SAFETY.md`](windows/docs/SAFETY.md) | exactly what it touches |
 | [`docs/NOTICE.md`](docs/NOTICE.md) · [`windows/docs/NOTICE.md`](windows/docs/NOTICE.md) | licensing & originality |
 | [`CHANGELOG.md`](CHANGELOG.md) | release history |
 
+## Contributing
+
+Issues and pull requests are welcome.
+
+- Run `./install.sh --dry-run` and `scripts/smoke-test.sh` (macOS) or
+  `powershell -File windows\install.ps1 -DryRun` (Windows) before opening a PR.
+- CI lints shell (`shellcheck`), parses with bash 3.2, runs PSScriptAnalyzer, builds both apps, and runs
+  the installer dry-runs.
+- Docs are the single source for the in-app Help (macOS renders `docs/HELP.md`, Windows packages
+  `windows/docs/HELP.md`).
+
 ## Support
 
-If dev-stack saves you time: **♥ [Donate](https://www.itsmeshafat.com/donate)**.
+If dev-stack saves you time: **♥ [Donate](https://www.itsmeshafat.com/donate)** — GitHub also shows a
+**Sponsor** button (via [`.github/FUNDING.yml`](.github/FUNDING.yml)).
 
-## Disclaimer
+## License & disclaimer
 
-Provided **“as is”**, without warranty of any kind — see the [MIT License](LICENSE). You use it at your own
-risk. It does **not** back up your databases or project files; take your own dumps and keep projects under
-version control.
+[MIT](LICENSE). Provided **“as is”**, without warranty of any kind, express or implied — you use it at
+your own risk. The authors are not liable for data loss or service interruption. Take your own database
+dumps and keep projects under version control.
 
-## License
-
-MIT — see [LICENSE](LICENSE).
-
-<p align="center">
-  <br>
-  <img src="docs/logo.png" width="44" alt="">
-  <br>
-  <sub><b>dev-stack</b> — built for a Mac and a PC that run everything.</sub>
-</p>
+<div align="center">
+<br>
+<img src="docs/logo.png" width="44" alt="dev-stack">
+<br>
+<sub><b>dev-stack</b> — a Mac and a PC that run everything.</sub>
+</div>
