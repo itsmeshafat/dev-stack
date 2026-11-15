@@ -80,8 +80,12 @@ jobs:
         shell: powershell
         run: |
           $files = Get-ChildItem -Recurse -Path windows -Include *.ps1,*.psm1 -File
-          $results = Invoke-ScriptAnalyzer -Path $files.FullName -Severity Error
-          if ($results) {
+          # NOTE: Invoke-ScriptAnalyzer's -Path is a single path in this version, so run per file.
+          $results = @()
+          foreach ($f in $files) {
+            $results += Invoke-ScriptAnalyzer -Path $f.FullName -Severity Error
+          }
+          if ($results.Count -gt 0) {
             $results | Format-Table -AutoSize | Out-String | Write-Host
             exit 1
           }
