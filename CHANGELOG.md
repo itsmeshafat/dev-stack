@@ -3,6 +3,14 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.6.1] — 2026-11-16
+
+### Fixed
+- **CI (Windows)** — the `PSScriptAnalyzer` step passed the array `$files.FullName` to
+  `Invoke-ScriptAnalyzer -Path`, which takes a single path in the installed version, so the step failed
+  with `CannotConvertArgument` before the parse/build checks ran. It now runs the analyzer per file.
+  No application code changed in this release.
+
 ## [1.6.0] — 2026-11-16
 
 ### Added
@@ -179,3 +187,4 @@ All notable changes to this project are documented here. The format follows
 [1.4.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.4.0
 [1.5.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.5.0
 [1.6.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.6.0
+[1.6.1]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.6.1

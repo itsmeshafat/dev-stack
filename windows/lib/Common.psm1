@@ -3,7 +3,7 @@
 # Sourced (Import-Module) by devstack.ps1, install.ps1 and bin/*.
 Set-StrictMode -Version Latest
 
-$script:DevStackVersion = '1.6.0'
+$script:DevStackVersion = '1.6.1'
 $script:DryRun = $false
 $script:Quiet = $false
 $script:BackupTs = $null

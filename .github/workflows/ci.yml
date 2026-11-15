@@ -128,5 +128,5 @@ jobs:
           $json = powershell -NoProfile -ExecutionPolicy Bypass -File windows\devstack.ps1 update --check --json
           $json | Write-Host
           $obj = $json | ConvertFrom-Json
-          if ($obj.current -ne '1.6.0') { exit 1 }
+          if ($obj.current -ne '1.6.1') { exit 1 }
           Write-Host "update check OK"
