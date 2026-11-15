@@ -3,6 +3,29 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.6.0] — 2026-11-16
+
+### Added
+- **Windows platform** — a first-class Windows 10/11 (x64) implementation alongside macOS, with the same
+  command surface and `sites.conf` format. It lives under `windows/` with its own self-contained docs
+  (`windows/README.md`, `windows/docs/`). The macOS implementation is unchanged.
+  - **Stack:** nginx -> Apache (Apache Lounge) on `127.0.0.1:8081` -> PHP via **php-cgi FastCGI** (one port
+    per version), plus MySQL, PostgreSQL, Redis and Mailpit, all run as unelevated local processes.
+  - **CLI:** PowerShell (`devstack.ps1`) mirroring `status/start/stop/restart/sites/add-site/sync/ssl/
+    composer/phpmyadmin/update/doctor/version`.
+  - **Control app:** native Windows Forms (`windows/app/`, built with the in-box `csc.exe` - no SDK
+    required), wrapping the CLI exactly as the SwiftUI app does. It installs to
+    `%LOCALAPPDATA%\Programs\DevStack`, with a Start Menu shortcut, an **Apps & features** entry and a
+    standard uninstaller. Closing the window keeps it running in the **notification area** (system tray),
+    where it can be reopened, start/stop services (whole stack or one module), or quit.
+  - **Privileges:** the only elevated action is the hosts-file write, done by a single **DevStackHelper**
+    scheduled task registered once (one UAC prompt); nginx/Apache/php-cgi need no elevation because Windows
+    does not restrict low ports.
+  - **Updates:** verified, atomic, **out-of-process** swap (Windows locks the running script's files) with
+    rollback.
+  - **CI:** a `windows-latest` job (PSScriptAnalyzer, PowerShell parse, app build, installer dry-run, offline
+    update-check fixture) and a new release workflow that attaches per-platform archives.
+
 ## [1.5.0] — 2026-11-03
 
 ### Added
@@ -155,3 +178,4 @@ All notable changes to this project are documented here. The format follows
 [1.3.5]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.3.5
 [1.4.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.4.0
 [1.5.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.5.0
+[1.6.0]: https://github.com/itsmeshafat/dev-stack/releases/tag/v1.6.0

@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    name: macOS package (+ app)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build the app
+        run: |
+          bash app/build-app.sh "$RUNNER_TEMP/Dev Stack.app"
+          test -x "$RUNNER_TEMP/Dev Stack.app/Contents/MacOS/DevStack" && echo "app built"
+
+      - name: Package
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          mkdir -p dist
+          git archive --format=tar.gz --prefix="dev-stack-$VERSION/" -o "dist/devstack-macos-$VERSION.tar.gz" HEAD
+          (cd "$RUNNER_TEMP" && zip -qry "$GITHUB_WORKSPACE/dist/devstack-macos-app-$VERSION.zip" "Dev Stack.app")
+          ls -lh dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-dist
+          path: dist/*
+
+  windows:
+    name: Windows package (+ exe)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build the app (in-box csc)
+        shell: powershell
+        run: |
+          $out = Join-Path $env:RUNNER_TEMP 'app'
+          powershell -NoProfile -ExecutionPolicy Bypass -File windows\app\build-app.ps1 -OutDir $out
+          if (-not (Test-Path (Join-Path $out 'DevStack.exe'))) { throw 'app build missing DevStack.exe' }
+
+      - name: Package
+        shell: powershell
+        run: |
+          $v = $env:GITHUB_REF_NAME.TrimStart('v')
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item -LiteralPath (Join-Path $env:RUNNER_TEMP 'app\DevStack.exe') -Destination 'windows\app\DevStack.exe' -Force
+          Compress-Archive -Path 'windows\*' -DestinationPath ("dist\devstack-windows-$v.zip") -Force
+          Get-ChildItem dist | Format-Table Name,Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-dist
+          path: dist/*
+
+  publish:
+    name: Publish release
+    needs: [macos, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Show assets
+        run: ls -lh dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

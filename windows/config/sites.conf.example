@@ -1,0 +1,12 @@
+# dev-stack sites configuration (Windows)
+# One site per line:  host | docroot | php | kind | aliases(optional, comma separated)
+# 'kind' is informational (php|laravel|wp|legacy). '#' starts a comment.
+#
+# Copied to %USERPROFILE%\.config\devstack\sites.conf by install.ps1, or run:
+#   devstack add-site
+#
+# Example:
+# casepilot.test | C:\Sites\CasePilot\public | 8.3 | laravel
+# jd-blog.test   | C:\Sites\jd-blog\public   | 8.5 | php
+# wptest.test    | C:\Sites\wptest           | 8.5 | wp
+# myapp.test     | C:\Sites\myapp            | 8.5 | laravel | www.myapp.test

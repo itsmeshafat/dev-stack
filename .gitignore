@@ -8,6 +8,11 @@ app/Assets/AppIcon.iconset/
 app/Assets/icon-*.png
 build/
 *.app
+windows/app/**/bin/
+windows/app/**/obj/
+windows/app/AppIcon.ico
+windows/app/DevStack.exe
+dist/
 
 # --- runtime ---
 backups/
@@ -15,3 +20,6 @@ backups/
 *.pem
 *-key.pem
 .DS_Store
+
+# --- Ai & skills ---
+.commandcode/
