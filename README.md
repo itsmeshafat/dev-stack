@@ -56,6 +56,12 @@
 | **Updates** | verified, atomic, rollback — never touches your data |
 | **License** | MIT |
 
+<div align="center">
+  <img src="docs/terminal.png" alt="devstack status - all nine modules running" width="760">
+  <br>
+  <sub><code>devstack status</code> - every module, live.</sub>
+</div>
+
 ## Why dev-stack
 
 | | |
@@ -133,23 +139,12 @@ identical on both, so a configuration moves between machines.
 
 ## How it works
 
-```text
-                      ┌──────────── yourapp.test :80 / :443 ────────────┐
-   browser ──────────▶│ nginx                                           │
-                      │   servers/<host>.conf → proxy_pass 127.0.0.1:8081
-                      └───────────────────────┬─────────────────────────┘
-                                              ▼
-                      ┌──────── Apache 127.0.0.1:8081 ──────────────────┐
-                      │   AllowOverride All  → .htaccess / mod_rewrite   │
-                      │   macOS:   proxy:unix:/tmp/devstack-php-8x.sock  │
-                      │   Windows: fcgid → 127.0.0.1:9085 / 9083 / 9074  │
-                      └───────────────────────┬─────────────────────────┘
-                                              ▼
-                      PHP-FPM (macOS)  ·  php-cgi (Windows)
+<div align="center">
+  <img src="docs/architecture.png" alt="Request flow: browser to nginx to Apache to PHP, plus data services and managed DNS" width="100%">
+</div>
 
-   data:  mysql :3306 · postgres :5432 · redis :6379 · mailpit :1025 / :8025
-   DNS:   127.0.0.1 <host> in one managed hosts block (from nginx server_name)
-```
+Browser -> nginx (`:80` / `:443`) -> Apache (`127.0.0.1:8081`, `.htaccess`) -> PHP (`php-fpm` on macOS,
+`php-cgi` on Windows). Data services run alongside, and `*.test` resolves through one managed hosts block.
 
 nginx is the **single public entry point**. Apache binds to **loopback only**, so nothing is exposed
 beyond your machine. Full details: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) ·
